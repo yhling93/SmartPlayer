@@ -16,7 +16,14 @@ namespace SmartPlayer
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+
+            PXCMSession session = PXCMSession.CreateInstance();
+            if(session!=null)
+            {
+                Application.Run(new MainForm(session));
+                session.Dispose();
+            }
+            
         }
     }
 }
