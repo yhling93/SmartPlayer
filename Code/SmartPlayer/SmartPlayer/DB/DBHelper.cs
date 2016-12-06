@@ -6,14 +6,17 @@ using System.Threading.Tasks;
 using SmartPlayer.Data.ContextData;
 using SmartPlayer.Data.InteractionData;
 using SmartPlayer.Data.RealSenseData;
+using System.Configuration;
 
 namespace SmartPlayer.DB
 {
     class DBHelper : IDB
     {
+
         public DBHelper()
         {
-
+            string dbAddr = ConfigurationManager.AppSettings["MongoDB_Server"].ToString();
+            string dbName = ConfigurationManager.AppSettings["MongoDB_DBName"].ToString();
         }
 
         public bool saveFacialExpression(FacialExpression facialExpression)
