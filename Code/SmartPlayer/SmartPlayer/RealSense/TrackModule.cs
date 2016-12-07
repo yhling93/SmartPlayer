@@ -6,15 +6,22 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Runtime.Remoting.Channels;
 using System.Windows.Forms;
+using SmartPlayer.DB;
+using SmartPlayer.Data.InteractionData;
+using SmartPlayer.Data.RealSenseData;
 
 namespace SmartPlayer.RealSense
 {
     class TrackModule
     {
+
+        private DBHelper dbhelper;
         /// <summary>
         /// 窗体，用来令此窗口更新
         /// </summary>
         private readonly MainForm m_form;
+
+        private const int NUM_PERSONS = 1;
 
         /// <summary>
         /// 构造函数，将窗体传进来
@@ -23,6 +30,15 @@ namespace SmartPlayer.RealSense
         public TrackModule(MainForm form)
         {
             m_form = form;
+            dbhelper = new DBHelper();
+            //InteractionEvent ievent = new InteractionEvent();
+            //ievent.eventType = EventType.PauseEvent;
+            //ievent.eventParams = new Dictionary<string, string>();
+            //ievent.eventParams.Add("key", "value");
+            //ievent.happenTS = new Data.CustomTime();
+            //ievent.happenTS.absTS = DateTime.Now;
+            //ievent.happenTS.videoTS = 70;
+            //dbhelper.saveEntity(ievent);
         }
 
         /// <summary>
@@ -79,34 +95,162 @@ namespace SmartPlayer.RealSense
 
             pp.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_COLOR, 1920, 1080);
 
-            pp.Init();
-
-            while (!m_form.Stopped)
+            // 面部初始化
+            pp.EnableFace();
+            PXCMFaceModule faceModule = pp.QueryFace();
+            if(faceModule==null)
             {
-                if (pp.AcquireFrame(true).IsError()) break;
-
-                var isConnected = pp.IsConnected();
-                if (isConnected)
-                {
-                    var sample = pp.QueryFaceSample();
-                    if (sample == null)
-                    {
-                        pp.ReleaseFrame();
-                        continue;
-                    }
-
-                    // default is COLOR
-                    DisplayPicture(sample.color);
-                    m_form.UpdatePic();
-
-                }
-                pp.ReleaseFrame();
+                Debug.Assert(true);
+                return;
             }
+            PXCMFaceConfiguration faceCfg = faceModule.CreateActiveConfiguration();
+            if(faceCfg==null)
+            {
+                Debug.Assert(true);
+                return;
+            }
+            faceCfg.SetTrackingMode(PXCMFaceConfiguration.TrackingModeType.FACE_MODE_COLOR_PLUS_DEPTH);
+            faceCfg.strategy = PXCMFaceConfiguration.TrackingStrategyType.STRATEGY_CLOSEST_TO_FARTHEST;
+            // 单个人追踪
+            faceCfg.detection.maxTrackedFaces = NUM_PERSONS;
+            faceCfg.landmarks.maxTrackedFaces = NUM_PERSONS;
+            faceCfg.pose.maxTrackedFaces = NUM_PERSONS;
+
+            // 表情初始化
+            PXCMFaceConfiguration.ExpressionsConfiguration expressionCfg = faceCfg.QueryExpressions();
+            if (expressionCfg == null)
+            {
+                throw new Exception("ExpressionsConfiguration null");
+            }
+            expressionCfg.properties.maxTrackedFaces = NUM_PERSONS;
+
+            expressionCfg.EnableAllExpressions();
+            faceCfg.detection.isEnabled = true;
+            faceCfg.landmarks.isEnabled = true;
+            faceCfg.pose.isEnabled = true;
+            if (expressionCfg!= null)
+            {
+                expressionCfg.Enable();
+            }
+
+            //脉搏初始化
+            PXCMFaceConfiguration.PulseConfiguration pulseConfiguration = faceCfg.QueryPulse();
+            if (pulseConfiguration == null)
+            {
+                throw new Exception("pulseConfiguration null");
+            }
+
+            pulseConfiguration.properties.maxTrackedFaces = NUM_PERSONS;
+            if (pulseConfiguration != null)
+            {
+                pulseConfiguration.Enable();
+            }
+
+            // 面部识别功能初始化
+            //PXCMFaceConfiguration.RecognitionConfiguration qrecognition = faceCfg.QueryRecognition();
+            //if (qrecognition == null)
+            //{
+            //    throw new Exception("PXCMFaceConfiguration.RecognitionConfiguration null");
+            //}
+            //else
+            //{
+            //    qrecognition.Enable();
+            //}
+
+            faceCfg.ApplyChanges();
+            
+            if(pp.Init()<pxcmStatus.PXCM_STATUS_NO_ERROR)
+            {
+                throw new Exception("Init failed");
+            }
+            else
+            {
+                using (PXCMFaceData faceData = faceModule.CreateOutput())
+                {
+                    if(faceData==null)
+                    {
+                        throw new Exception("face data failure");
+                    }
+                    while (!m_form.Stopped)
+                    {
+                        if (pp.AcquireFrame(true).IsError()) break;
+
+                        var isConnected = pp.IsConnected();
+                        if (isConnected)
+                        {
+                            var sample = pp.QueryFaceSample();
+                            if (sample == null)
+                            {
+                                pp.ReleaseFrame();
+                                continue;
+                            }
+
+                            // default is COLOR
+                            DisplayPicture(sample.color);
+
+                            // 如果检测脸数==0，则continue
+                            faceData.Update();
+                            int nFace = faceData.QueryNumberOfDetectedFaces();
+                            if(nFace==0)
+                            {
+                                continue;
+                            }
+
+                            // 存
+                            PXCMFaceData.Face face = faceData.QueryFaceByIndex(0);
+                            //SaveFaceLandmarkData(face);
+                            SaveFacialExpressionData(face);
+
+                            m_form.UpdatePic();
+
+                        }
+                        pp.ReleaseFrame();
+                    }
+                }
+            }
+
+           
 
             pp.Close();
             pp.Dispose();
         }
         
+        private void SaveFaceLandmarkData(PXCMFaceData.Face face)
+        {
+            FacialLandmarks flm = new FacialLandmarks();
+            flm.updateData(face);
+#if DEBUG
+            //Console.WriteLine(flm.ToString());
+#endif
+            dbhelper.saveEntity(flm);           
+        }
+
+        private void SaveFacialExpressionData(PXCMFaceData.Face face)
+        {
+            FacialExpression fe = new FacialExpression();
+            PXCMFaceData.ExpressionsData edata = face.QueryExpressions();
+            if(edata==null)
+            {
+#if DEBUG
+                Console.WriteLine("no expression this frame");
+#endif
+                return;
+            }
+#if DEBUG
+            else
+            {
+                Console.WriteLine("catch expression");
+            }
+#endif
+            for(int i=0;i<22;i++)
+            {
+                PXCMFaceData.ExpressionsData.FaceExpressionResult score;
+                edata.QueryExpression((PXCMFaceData.ExpressionsData.FaceExpression)i, out score);
+                fe.facialExpressionIndensity[i] = score.intensity;
+            }
+            //dbhelper.saveEntity(fe);
+        }
+
         /// <summary>
         /// 将图像缓存入m_form中的m_bitmap中
         /// </summary>

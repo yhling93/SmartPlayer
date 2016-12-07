@@ -40,5 +40,10 @@ namespace SmartPlayer.Data.RealSenseData
         public int[] facialExpressionIndensity { set; get; }
         // 表情发生时间
         public CustomTime happenTS { set; get; }
+
+        public FacialExpression()
+        {
+            this.facialExpressionIndensity = new int[22];
+        }
     }
 }

@@ -59,7 +59,8 @@ namespace SmartPlayer
         private void Go()
         {
             var trackModule = new TrackModule(this);
-            trackModule.NaivePipeline();
+            //trackModule.NaivePipeline();
+            trackModule.FacePipeLine();
         }
 
         /// <summary>
@@ -69,16 +70,16 @@ namespace SmartPlayer
         /// <param name="e"></param>
         private void Pb_Monitor_Paint(object sender, PaintEventArgs e)
         {
-            Console.WriteLine(" Pb_Monitor_Paint");
+            //Console.WriteLine(" Pb_Monitor_Paint");
             lock (m_bitmapLock)
             {
-                Console.WriteLine(" Pb_Monitor_Paint Enter Lock");
+                //Console.WriteLine(" Pb_Monitor_Paint Enter Lock");
                 if (m_bitmap == null) return;
 
                 e.Graphics.DrawImage(m_bitmap, pb_Monitor.ClientRectangle);
                 //e.Graphics.DrawImageUnscaled(m_bitmap, 0, 0);
             }
-            Console.WriteLine(" Pb_Monitor_Paint Exit");
+            //Console.WriteLine(" Pb_Monitor_Paint Exit");
         }
 
         /// <summary>

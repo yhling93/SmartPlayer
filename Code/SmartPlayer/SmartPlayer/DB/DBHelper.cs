@@ -46,9 +46,9 @@ namespace SmartPlayer.DB
         public void test()
         {
             FacialLandmarks facialLandmarks = new FacialLandmarks();
-            Dictionary<PXCMFaceData.LandmarksGroupType, PXCMFaceData.LandmarkPoint[]> landmarksData = new Dictionary<PXCMFaceData.LandmarksGroupType, PXCMFaceData.LandmarkPoint[]>();
-            PXCMFaceData.LandmarkPoint[] points = new PXCMFaceData.LandmarkPoint[20];
-            points[0] = new PXCMFaceData.LandmarkPoint();
+            Dictionary<PXCMFaceData.LandmarksGroupType, PXCMPoint3DF32[]> landmarksData = new Dictionary<PXCMFaceData.LandmarksGroupType, PXCMPoint3DF32[]>();
+            PXCMPoint3DF32[] points = new PXCMPoint3DF32[20];
+            points[0] = new PXCMPoint3DF32();
             landmarksData.Add(PXCMFaceData.LandmarksGroupType.LANDMARK_GROUP_JAW, points);
             CustomTime happenTS = new CustomTime();
             happenTS.absTS = DateTime.Now;
