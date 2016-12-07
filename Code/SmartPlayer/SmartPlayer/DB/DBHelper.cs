@@ -8,10 +8,14 @@ using SmartPlayer.Data.InteractionData;
 using SmartPlayer.Data.RealSenseData;
 using System.Configuration;
 using MongoDB.Driver;
+using SmartPlayer.Data;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Bson;
 
 namespace SmartPlayer.DB
 {
-    class DBHelper : IDB
+    public class DBHelper : IDB
     {
 
         IMongoClient mongoClient;
@@ -25,11 +29,40 @@ namespace SmartPlayer.DB
             //mongoClient = new MongoClient(dbAddr);
             mongoClient = new MongoClient(dbAddr);
             mongoDatabase = mongoClient.GetDatabase(dbName);
+
+            BsonSerializer.RegisterSerializer(new EnumSerializer<PXCMFaceData.LandmarksGroupType>(BsonType.String));
+            BsonSerializer.RegisterSerializer(new EnumSerializer<PXCMFaceData.LandmarkType>(BsonType.String));
+            BsonSerializer.RegisterSerializer(new EnumSerializer<EventType>(BsonType.String));
+            BsonSerializer.RegisterSerializer(new EnumSerializer<PXCMHandData.GestureStateType>(BsonType.String));
+        }
+
+        public void saveEntity<T> (T obj)
+        {
+            string typeName = obj.GetType().Name;
+            IMongoCollection<T> collection = mongoDatabase.GetCollection<T>(typeName);
+            collection.InsertOne(obj);
+        }
+
+        public void test()
+        {
+            FacialLandmarks facialLandmarks = new FacialLandmarks();
+            Dictionary<PXCMFaceData.LandmarksGroupType, PXCMFaceData.LandmarkPoint[]> landmarksData = new Dictionary<PXCMFaceData.LandmarksGroupType, PXCMFaceData.LandmarkPoint[]>();
+            PXCMFaceData.LandmarkPoint[] points = new PXCMFaceData.LandmarkPoint[20];
+            points[0] = new PXCMFaceData.LandmarkPoint();
+            landmarksData.Add(PXCMFaceData.LandmarksGroupType.LANDMARK_GROUP_JAW, points);
+            CustomTime happenTS = new CustomTime();
+            happenTS.absTS = DateTime.Now;
+            happenTS.videoTS = 70;
+            facialLandmarks.happenTS = happenTS;
+            facialLandmarks.landmarksData = landmarksData;
+            saveEntity(facialLandmarks);
         }
 
         public bool saveFacialExpression(FacialExpression facialExpression)
         {
-            throw new NotImplementedException();
+            IMongoCollection<FacialExpression> collection = mongoDatabase.GetCollection<FacialExpression>("FacialExpression");
+            collection.InsertOne(facialExpression);
+            return true;
         }
 
         public bool saveFacialLandmarks(FacialLandmarks facialLandmarks)

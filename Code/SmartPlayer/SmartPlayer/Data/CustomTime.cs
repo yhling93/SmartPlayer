@@ -9,12 +9,12 @@ namespace SmartPlayer.Data
     /// <summary>
     /// 自定义事件
     /// </summary>
-    class CustomTime
+    public class CustomTime
     {
         // 世界时刻
-        private DateTime absTS;
-        // 视频时刻
-        private DateTime videoTS;
+        public DateTime absTS { set; get; }
+        // 视频时刻 （单位是s）
+        public int videoTS { set; get; }
 
     }
 }

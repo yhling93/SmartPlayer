@@ -9,14 +9,14 @@ namespace SmartPlayer.Data.InteractionData
     /// <summary>
     /// 键盘鼠标交互事件
     /// </summary>
-    class InteractionEvent
+    public class InteractionEvent
     {
         // 事件类型
-        private EventType eventType;
+        public EventType eventType { set; get; }
         // 事件发生时间
-        private CustomTime happenTS;
+        public CustomTime happenTS { set; get; }
         // 事件参数
-        private Dictionary<String, String> eventParams; 
+        public Dictionary<string, string> eventParams { set; get; }
     }
 
     /// <summary>
@@ -26,7 +26,7 @@ namespace SmartPlayer.Data.InteractionData
     /// 3. 视频回放事件
     /// 4. 鼠标移动事件
     /// </summary>
-    enum EventType
+    public enum EventType
     {
         UndefinedEvent, PauseEvent, RewindEvent, MouseMoveEvent
     }

@@ -9,11 +9,11 @@ namespace SmartPlayer.Data.RealSenseData
     /// <summary>
     /// 面部标定数据
     /// </summary>
-    class FacialLandmarks
+    public class FacialLandmarks
     {
         // RealSense提供
-        private Dictionary<PXCMFaceData.LandmarksGroupType, PXCMFaceData.LandmarkPoint[]> landmarksData;
+        public Dictionary<PXCMFaceData.LandmarksGroupType, PXCMFaceData.LandmarkPoint[]> landmarksData { set; get; }
         // 发生时间
-        private CustomTime happenTS;
+        public CustomTime happenTS { set; get; }
     }
 }

@@ -10,11 +10,11 @@ namespace SmartPlayer.Data.ContextData
     /// <summary>
     /// 老师说话的语速
     /// </summary>
-    class SpeechSpeed
+    public class SpeechSpeed
     {
         // 语速
-        private int speedPerMin;
+        public int speedPerMin { set; get; }
         // 视频时刻
-        private DateTime videoTS;
+        public DateTime videoTS { set; get; }
     }
 }

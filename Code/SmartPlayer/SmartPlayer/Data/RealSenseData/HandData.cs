@@ -9,15 +9,15 @@ namespace SmartPlayer.Data.RealSenseData
     /// <summary>
     /// 手部标定数据
     /// </summary>
-    class HandData
+    public class HandData
     {
         // 手轮廓定位点
-        private PXCMPointI32[] handContour;
+        public PXCMPointI32[] handContour { set; get; }
         // 手关节坐标
-        private PXCMHandData.JointData[] handJoint;
+        public PXCMHandData.JointData[] handJoint { set; get; }
         // 手指弯曲和半径
-        private PXCMHandData.FingerData[] handFinger;
+        public PXCMHandData.FingerData[] handFinger { set; get; }
         // 发生时间
-        private CustomTime happenTS;
+        public CustomTime happenTS { set; get; }
     }
 }

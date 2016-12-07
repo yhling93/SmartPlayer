@@ -9,7 +9,7 @@ namespace SmartPlayer.Data.RealSenseData
     /// <summary>
     /// 面部表情
     /// </summary>
-    class FacialExpression
+    public class FacialExpression
     {
         //{
         //    EXPRESSION_BROW_RAISER_LEFT = 0,
@@ -37,8 +37,8 @@ namespace SmartPlayer.Data.RealSenseData
         //}
 
         // RealSense提供，包含表情及程度
-        private int[] facialExpressionIndensity;
+        public int[] facialExpressionIndensity { set; get; }
         // 表情发生时间
-        private CustomTime happenTS;
+        public CustomTime happenTS { set; get; }
     }
 }

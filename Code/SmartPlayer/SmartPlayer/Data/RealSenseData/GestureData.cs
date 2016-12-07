@@ -9,11 +9,11 @@ namespace SmartPlayer.Data.RealSenseData
     /// <summary>
     /// 手势
     /// </summary>
-    class GestureData
+    public class GestureData
     {
         // RealSense提供
-        private PXCMHandData.GestureData gestureData;
+        public PXCMHandData.GestureData gestureData { set; get; }
         // 发生时间
-        private CustomTime happenTS;
+        public CustomTime happenTS { set; get; }
     }
 }

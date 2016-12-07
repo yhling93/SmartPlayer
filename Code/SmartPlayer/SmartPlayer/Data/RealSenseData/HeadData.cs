@@ -9,17 +9,17 @@ namespace SmartPlayer.Data.RealSenseData
     /// <summary>
     /// 头相关数据
     /// </summary>
-    class HeadData
+    public class HeadData
     {
         // RealSense提供，头的位置
-        private PXCMFaceData.HeadPosition headPos;
+        public PXCMFaceData.HeadPosition headPos { set; get; }
         // RealSense提供，头的朝向
-        private PXCMFaceData.PoseEulerAngles poseEulerAngles;
-        private PXCMFaceData.PoseQuaternion outPoseQuaternion;
+        public PXCMFaceData.PoseEulerAngles poseEulerAngles { set; get; }
+        public PXCMFaceData.PoseQuaternion outPoseQuaternion { set; get; }
         // RealSense提供，头的区域
-        private PXCMRectI32[] boundingRect;
+        public PXCMRectI32[] boundingRect { set; get; }
         // 发生时间
-        private CustomTime happenTS;
+        public CustomTime happenTS { set; get; }
 
     }
 }
