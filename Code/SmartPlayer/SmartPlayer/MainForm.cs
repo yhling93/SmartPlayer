@@ -38,6 +38,7 @@ namespace SmartPlayer
 
             //Sleep(200);
             var thread = new Thread(Go);
+            thread.IsBackground = true;
             thread.Start();
         }
 
@@ -49,6 +50,7 @@ namespace SmartPlayer
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Stopped = true;
+           
         }
 
         /// <summary>
