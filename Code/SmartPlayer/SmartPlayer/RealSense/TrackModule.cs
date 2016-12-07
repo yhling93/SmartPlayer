@@ -63,6 +63,48 @@ namespace SmartPlayer.RealSense
                 }
                 pp.ReleaseFrame();
             }
+
+            pp.Close();
+            pp.Dispose();
+        }
+
+        public void FacePipeLine()
+        {
+            PXCMSenseManager pp = m_form.Session.CreateSenseManager();
+
+            if (pp == null)
+            {
+                throw new Exception("PXCMSenseManager null");
+            }
+
+            pp.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_COLOR, 1920, 1080);
+
+            pp.Init();
+
+            while (!m_form.Stopped)
+            {
+                if (pp.AcquireFrame(true).IsError()) break;
+
+                var isConnected = pp.IsConnected();
+                if (isConnected)
+                {
+                    var sample = pp.QueryFaceSample();
+                    if (sample == null)
+                    {
+                        pp.ReleaseFrame();
+                        continue;
+                    }
+
+                    // default is COLOR
+                    DisplayPicture(sample.color);
+                    m_form.UpdatePic();
+
+                }
+                pp.ReleaseFrame();
+            }
+
+            pp.Close();
+            pp.Dispose();
         }
         
         /// <summary>
