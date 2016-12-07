@@ -7,16 +7,24 @@ using SmartPlayer.Data.ContextData;
 using SmartPlayer.Data.InteractionData;
 using SmartPlayer.Data.RealSenseData;
 using System.Configuration;
+using MongoDB.Driver;
 
 namespace SmartPlayer.DB
 {
     class DBHelper : IDB
     {
 
+        IMongoClient mongoClient;
+        IMongoDatabase mongoDatabase;
+
         public DBHelper()
         {
             string dbAddr = ConfigurationManager.AppSettings["MongoDB_Server"].ToString();
             string dbName = ConfigurationManager.AppSettings["MongoDB_DBName"].ToString();
+
+            //mongoClient = new MongoClient(dbAddr);
+            mongoClient = new MongoClient(dbAddr);
+            mongoDatabase = mongoClient.GetDatabase(dbName);
         }
 
         public bool saveFacialExpression(FacialExpression facialExpression)
