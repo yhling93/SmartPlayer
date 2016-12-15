@@ -263,7 +263,5 @@ namespace SmartPlayer.RealSense
             m_form.DrawBitmap(data.ToBitmap(0, image.info.width, image.info.height));
             image.ReleaseAccess(data);
         }
-
-      
     }
 }
