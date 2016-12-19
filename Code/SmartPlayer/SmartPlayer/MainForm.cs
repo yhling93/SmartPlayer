@@ -65,7 +65,8 @@ namespace SmartPlayer
         {
             var trackModule = new TrackModule(this);
             //trackModule.NaivePipeline();
-            trackModule.FacePipeLine();
+            //trackModule.FacePipeLine();
+            trackModule.HandPipeLine();
         }
 
         /// <summary>

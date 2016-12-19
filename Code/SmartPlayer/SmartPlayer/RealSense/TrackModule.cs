@@ -202,7 +202,7 @@ namespace SmartPlayer.RealSense
                             // 存
                             PXCMFaceData.Face face = faceData.QueryFaceByIndex(0);
                             //SaveFaceLandmarkData(face);
-                            SaveFacialExpressionData(face);
+                            //SaveFacialExpressionData(face);
 
                             m_form.UpdatePic();
 
@@ -264,10 +264,17 @@ namespace SmartPlayer.RealSense
                 return;
             }
 
+            if(pp.Init(handler)!=pxcmStatus.PXCM_STATUS_NO_ERROR)
+            {
+                Console.WriteLine("init failed");
+                return;
+            }
+
             if (handConfiguration != null)
             {
                 PXCMHandData.TrackingModeType trackingMode = PXCMHandData.TrackingModeType.TRACKING_MODE_FULL_HAND;
 
+                // 配置收的Tracking Mode
                 trackingMode = PXCMHandData.TrackingModeType.TRACKING_MODE_FULL_HAND;
 
                 handConfiguration.SetTrackingMode(trackingMode);
@@ -326,7 +333,7 @@ namespace SmartPlayer.RealSense
 
                 frameCounter++;
 
-                if (!pp.IsConnected())
+                if (pp.IsConnected())
                 {
                     PXCMCapture.Sample sample;
                     sample = pp.QueryHandSample();
@@ -335,14 +342,23 @@ namespace SmartPlayer.RealSense
                         // frameNumber = liveCamera ? frameCounter : instance.captureManager.QueryFrameIndex();
                         frameNumber = frameCounter;
                     }
+                    //bool b=(sample.ir==null);
+                    //b = (sample.color== null);
+                    //b = (sample.left == null);
+                    //b = (sample.right == null);
+                    DisplayPicture(sample.depth);
+
                     if (handData != null)
                     {
                         handData.Update();
 
+                        SaveHandData(handData);
                     }
-
+                    m_form.UpdatePic();
                 }
                 pp.ReleaseFrame();
+
+
             }
 
             if (handData != null) handData.Dispose();
@@ -469,6 +485,30 @@ namespace SmartPlayer.RealSense
 
             pp.Close();
             pp.Dispose();
+        }
+
+        private void SaveHandData(PXCMHandData handAnalysis)
+        {
+            int numOfHands = handAnalysis.QueryNumberOfHands();
+
+            for (int j = 0; j < numOfHands; j++)
+            {
+                int id;
+                PXCMImage.ImageData data;
+
+                handAnalysis.QueryHandId(PXCMHandData.AccessOrderType.ACCESS_ORDER_BY_TIME, j, out id);
+                //Get hand by time of appearance
+                PXCMHandData.IHand handData;
+                handAnalysis.QueryHandData(PXCMHandData.AccessOrderType.ACCESS_ORDER_BY_TIME, j, out handData);
+
+                if (handData != null)
+                {
+                    HandData hd = new HandData();
+                    hd.updateData(handData);
+
+                    dbhelper.saveEntity(hd);
+                }
+            }
         }
 
         private void SaveFaceLandmarkData(PXCMFaceData.Face face)
