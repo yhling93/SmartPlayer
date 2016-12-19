@@ -26,6 +26,9 @@ namespace SmartPlayer
         // 描述主界面是否暂停
         public bool Stopped = false;
 
+        // 视频事件模块
+        private VideoModule mVideoModule;
+
         /// <summary>
         /// 主窗体
         /// </summary>
@@ -40,6 +43,8 @@ namespace SmartPlayer
             var thread = new Thread(Go);
             thread.IsBackground = true;
             thread.Start();
+
+            mVideoModule = new VideoModule(axWindowsMediaPlayer);
         }
 
         /// <summary>
@@ -125,7 +130,5 @@ namespace SmartPlayer
                     new object[] { status });
 
         }
-
-   
     }
 }

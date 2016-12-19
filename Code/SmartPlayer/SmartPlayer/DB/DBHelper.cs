@@ -17,11 +17,12 @@ namespace SmartPlayer.DB
 {
     public class DBHelper : IDB
     {
-
         IMongoClient mongoClient;
         IMongoDatabase mongoDatabase;
 
-        public DBHelper()
+        private static readonly DBHelper mInstance = new DBHelper();
+
+        private DBHelper()
         {
             string dbAddr = ConfigurationManager.AppSettings["MongoDB_Server"].ToString();
             string dbName = ConfigurationManager.AppSettings["MongoDB_DBName"].ToString();
@@ -36,6 +37,11 @@ namespace SmartPlayer.DB
             BsonSerializer.RegisterSerializer(new EnumSerializer<PXCMHandData.GestureStateType>(BsonType.String));
         }
 
+        public static DBHelper getInstance()
+        {
+            return mInstance;
+        }
+
         public void saveEntity<T> (T obj)
         {
             string typeName = obj.GetType().Name;
@@ -43,26 +49,9 @@ namespace SmartPlayer.DB
             collection.InsertOne(obj);
         }
 
-        public void test()
-        {
-            FacialLandmarks facialLandmarks = new FacialLandmarks();
-            Dictionary<PXCMFaceData.LandmarksGroupType, PXCMPoint3DF32[]> landmarksData = new Dictionary<PXCMFaceData.LandmarksGroupType, PXCMPoint3DF32[]>();
-            PXCMPoint3DF32[] points = new PXCMPoint3DF32[20];
-            points[0] = new PXCMPoint3DF32();
-            landmarksData.Add(PXCMFaceData.LandmarksGroupType.LANDMARK_GROUP_JAW, points);
-            CustomTime happenTS = new CustomTime();
-            happenTS.absTS = DateTime.Now;
-            happenTS.videoTS = 70;
-            facialLandmarks.happenTS = happenTS;
-            facialLandmarks.landmarksData = landmarksData;
-            saveEntity(facialLandmarks);
-        }
-
         public bool saveFacialExpression(FacialExpression facialExpression)
         {
-            IMongoCollection<FacialExpression> collection = mongoDatabase.GetCollection<FacialExpression>("FacialExpression");
-            collection.InsertOne(facialExpression);
-            return true;
+            throw new NotImplementedException();
         }
 
         public bool saveFacialLandmarks(FacialLandmarks facialLandmarks)
