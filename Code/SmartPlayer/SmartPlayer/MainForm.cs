@@ -149,6 +149,9 @@ namespace SmartPlayer
             mVlcPlayer.SetRenderWindow((int)render_wnd);
             // 用VlcPlayer构造VideoModule
             mVideoModule = new VideoModule(mVlcPlayer);
+
+            videoVolumeTrackBar.SetRange(0, 100);
+            videoVolumeTrackBar.Value = 50;
         }
         /// <summary>
         /// 初始化播放列表
@@ -295,6 +298,11 @@ namespace SmartPlayer
                 mVideoModule.setFullScreen(false);
                 this.WindowState = FormWindowState.Normal;
             }
+        }
+
+        private void videoVolumeTrackBar_Scroll(object sender, EventArgs e)
+        {
+            mVideoModule.setVolume(videoVolumeTrackBar.Value);
         }
         /******************** 视频相关 ********************/
     }

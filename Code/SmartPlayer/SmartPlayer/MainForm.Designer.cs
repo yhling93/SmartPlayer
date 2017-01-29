@@ -56,19 +56,20 @@
             // 
             // pb_Monitor
             // 
-            this.pb_Monitor.Location = new System.Drawing.Point(22, 38);
+            this.pb_Monitor.Location = new System.Drawing.Point(29, 48);
+            this.pb_Monitor.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.pb_Monitor.Name = "pb_Monitor";
-            this.pb_Monitor.Size = new System.Drawing.Size(198, 177);
+            this.pb_Monitor.Size = new System.Drawing.Size(264, 221);
             this.pb_Monitor.TabIndex = 0;
             this.pb_Monitor.TabStop = false;
             this.pb_Monitor.Click += new System.EventHandler(this.pb_Monitor_Click);
             // 
             // fastSpeedBtn
             // 
-            this.fastSpeedBtn.Location = new System.Drawing.Point(378, 32);
-            this.fastSpeedBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.fastSpeedBtn.Location = new System.Drawing.Point(504, 40);
+            this.fastSpeedBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.fastSpeedBtn.Name = "fastSpeedBtn";
-            this.fastSpeedBtn.Size = new System.Drawing.Size(61, 44);
+            this.fastSpeedBtn.Size = new System.Drawing.Size(81, 55);
             this.fastSpeedBtn.TabIndex = 3;
             this.fastSpeedBtn.Text = "快速播放";
             this.fastSpeedBtn.UseVisualStyleBackColor = true;
@@ -76,10 +77,10 @@
             // 
             // normalSpeedBtn
             // 
-            this.normalSpeedBtn.Location = new System.Drawing.Point(306, 32);
-            this.normalSpeedBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.normalSpeedBtn.Location = new System.Drawing.Point(408, 40);
+            this.normalSpeedBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.normalSpeedBtn.Name = "normalSpeedBtn";
-            this.normalSpeedBtn.Size = new System.Drawing.Size(68, 44);
+            this.normalSpeedBtn.Size = new System.Drawing.Size(91, 55);
             this.normalSpeedBtn.TabIndex = 4;
             this.normalSpeedBtn.Text = "常速播放";
             this.normalSpeedBtn.UseVisualStyleBackColor = true;
@@ -87,10 +88,10 @@
             // 
             // slowSpeedBtn
             // 
-            this.slowSpeedBtn.Location = new System.Drawing.Point(241, 32);
-            this.slowSpeedBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.slowSpeedBtn.Location = new System.Drawing.Point(321, 40);
+            this.slowSpeedBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.slowSpeedBtn.Name = "slowSpeedBtn";
-            this.slowSpeedBtn.Size = new System.Drawing.Size(61, 44);
+            this.slowSpeedBtn.Size = new System.Drawing.Size(81, 55);
             this.slowSpeedBtn.TabIndex = 5;
             this.slowSpeedBtn.Text = "慢速播放";
             this.slowSpeedBtn.UseVisualStyleBackColor = true;
@@ -98,10 +99,10 @@
             // 
             // forwardBtn
             // 
-            this.forwardBtn.Location = new System.Drawing.Point(176, 33);
-            this.forwardBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.forwardBtn.Location = new System.Drawing.Point(235, 41);
+            this.forwardBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.forwardBtn.Name = "forwardBtn";
-            this.forwardBtn.Size = new System.Drawing.Size(61, 43);
+            this.forwardBtn.Size = new System.Drawing.Size(81, 54);
             this.forwardBtn.TabIndex = 6;
             this.forwardBtn.Text = "快进播放";
             this.forwardBtn.UseVisualStyleBackColor = true;
@@ -110,10 +111,10 @@
             // 
             // normalBtn
             // 
-            this.normalBtn.Location = new System.Drawing.Point(2, 33);
-            this.normalBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.normalBtn.Location = new System.Drawing.Point(3, 41);
+            this.normalBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.normalBtn.Name = "normalBtn";
-            this.normalBtn.Size = new System.Drawing.Size(63, 43);
+            this.normalBtn.Size = new System.Drawing.Size(84, 54);
             this.normalBtn.TabIndex = 7;
             this.normalBtn.Text = "正常播放";
             this.normalBtn.UseVisualStyleBackColor = true;
@@ -121,10 +122,10 @@
             // 
             // reverseBtn
             // 
-            this.reverseBtn.Location = new System.Drawing.Point(111, 33);
-            this.reverseBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.reverseBtn.Location = new System.Drawing.Point(148, 41);
+            this.reverseBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.reverseBtn.Name = "reverseBtn";
-            this.reverseBtn.Size = new System.Drawing.Size(61, 43);
+            this.reverseBtn.Size = new System.Drawing.Size(81, 54);
             this.reverseBtn.TabIndex = 8;
             this.reverseBtn.Text = "倒退播放";
             this.reverseBtn.UseVisualStyleBackColor = true;
@@ -138,9 +139,10 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.videoPanel.BackColor = System.Drawing.Color.Black;
             this.videoPanel.Controls.Add(this.coverPanel);
-            this.videoPanel.Location = new System.Drawing.Point(235, 12);
+            this.videoPanel.Location = new System.Drawing.Point(313, 15);
+            this.videoPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.videoPanel.Name = "videoPanel";
-            this.videoPanel.Size = new System.Drawing.Size(665, 360);
+            this.videoPanel.Size = new System.Drawing.Size(887, 450);
             this.videoPanel.TabIndex = 9;
             // 
             // coverPanel
@@ -150,8 +152,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.coverPanel.BackColor = System.Drawing.Color.Transparent;
             this.coverPanel.Location = new System.Drawing.Point(1, 0);
+            this.coverPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.coverPanel.Name = "coverPanel";
-            this.coverPanel.Size = new System.Drawing.Size(664, 361);
+            this.coverPanel.Size = new System.Drawing.Size(885, 451);
             this.coverPanel.TabIndex = 0;
             this.coverPanel.DoubleClick += new System.EventHandler(this.coverPanel_DoubleClick);
             // 
@@ -168,17 +171,18 @@
             this.panel2.Controls.Add(this.slowSpeedBtn);
             this.panel2.Controls.Add(this.forwardBtn);
             this.panel2.Controls.Add(this.videoProgressTrackBar);
-            this.panel2.Location = new System.Drawing.Point(235, 378);
+            this.panel2.Location = new System.Drawing.Point(313, 472);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(665, 78);
+            this.panel2.Size = new System.Drawing.Size(887, 98);
             this.panel2.TabIndex = 10;
             // 
             // stopBtn
             // 
-            this.stopBtn.Location = new System.Drawing.Point(68, 33);
-            this.stopBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.stopBtn.Location = new System.Drawing.Point(91, 41);
+            this.stopBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.stopBtn.Name = "stopBtn";
-            this.stopBtn.Size = new System.Drawing.Size(40, 43);
+            this.stopBtn.Size = new System.Drawing.Size(53, 54);
             this.stopBtn.TabIndex = 14;
             this.stopBtn.Text = "停止";
             this.stopBtn.UseVisualStyleBackColor = true;
@@ -186,25 +190,29 @@
             // 
             // videoVolumeTrackBar
             // 
-            this.videoVolumeTrackBar.Location = new System.Drawing.Point(444, 34);
+            this.videoVolumeTrackBar.Location = new System.Drawing.Point(592, 42);
+            this.videoVolumeTrackBar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.videoVolumeTrackBar.Name = "videoVolumeTrackBar";
-            this.videoVolumeTrackBar.Size = new System.Drawing.Size(104, 45);
+            this.videoVolumeTrackBar.Size = new System.Drawing.Size(139, 56);
             this.videoVolumeTrackBar.TabIndex = 10;
+            this.videoVolumeTrackBar.Scroll += new System.EventHandler(this.videoVolumeTrackBar_Scroll);
             // 
             // videoProgressLabel
             // 
             this.videoProgressLabel.AutoSize = true;
-            this.videoProgressLabel.Location = new System.Drawing.Point(554, 48);
+            this.videoProgressLabel.Location = new System.Drawing.Point(739, 60);
+            this.videoProgressLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.videoProgressLabel.Name = "videoProgressLabel";
-            this.videoProgressLabel.Size = new System.Drawing.Size(107, 12);
+            this.videoProgressLabel.Size = new System.Drawing.Size(143, 15);
             this.videoProgressLabel.TabIndex = 9;
             this.videoProgressLabel.Text = "00:00:00/00:00:00";
             // 
             // videoProgressTrackBar
             // 
             this.videoProgressTrackBar.Location = new System.Drawing.Point(0, 0);
+            this.videoProgressTrackBar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.videoProgressTrackBar.Name = "videoProgressTrackBar";
-            this.videoProgressTrackBar.Size = new System.Drawing.Size(665, 45);
+            this.videoProgressTrackBar.Size = new System.Drawing.Size(887, 56);
             this.videoProgressTrackBar.TabIndex = 0;
             this.videoProgressTrackBar.Scroll += new System.EventHandler(this.videoProgressTrackBar_Scroll);
             // 
@@ -213,27 +221,30 @@
             this.videoListBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.videoListBox.FormattingEnabled = true;
-            this.videoListBox.ItemHeight = 12;
-            this.videoListBox.Location = new System.Drawing.Point(22, 267);
+            this.videoListBox.ItemHeight = 15;
+            this.videoListBox.Location = new System.Drawing.Point(29, 334);
+            this.videoListBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.videoListBox.Name = "videoListBox";
-            this.videoListBox.Size = new System.Drawing.Size(198, 184);
+            this.videoListBox.Size = new System.Drawing.Size(263, 229);
             this.videoListBox.TabIndex = 11;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(20, 12);
+            this.label2.Location = new System.Drawing.Point(27, 15);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(53, 12);
+            this.label2.Size = new System.Drawing.Size(67, 15);
             this.label2.TabIndex = 12;
             this.label2.Text = "实时画面";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(20, 238);
+            this.label3.Location = new System.Drawing.Point(27, 298);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(53, 12);
+            this.label3.Size = new System.Drawing.Size(67, 15);
             this.label3.TabIndex = 13;
             this.label3.Text = "播放列表";
             // 
@@ -244,15 +255,16 @@
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(927, 468);
+            this.ClientSize = new System.Drawing.Size(1236, 585);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.videoListBox);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.videoPanel);
             this.Controls.Add(this.pb_Monitor);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "MainForm";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.MainForm_Load);

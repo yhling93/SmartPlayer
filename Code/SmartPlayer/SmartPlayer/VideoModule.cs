@@ -192,5 +192,10 @@ namespace SmartPlayer
         {
             mPlayer.SetRate(1f);
         }
+
+        public void setVolume(int volume)
+        {
+            mPlayer.SetVolume(volume);
+        }
     }
 }

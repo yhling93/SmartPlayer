@@ -30,7 +30,7 @@ namespace SmartPlayer.RealSense
         public TrackModule(MainForm form)
         {
             m_form = form;
-            dbhelper = new DBHelper();
+            //dbhelper = new DBHelper();
             //InteractionEvent ievent = new InteractionEvent();
             //ievent.eventType = EventType.PauseEvent;
             //ievent.eventParams = new Dictionary<string, string>();
