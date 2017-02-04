@@ -7,6 +7,7 @@ using SmartPlayer.Data.InteractionData;
 using SmartPlayer.Data;
 using SmartPlayer.DB;
 using System.Threading;
+using System.IO;
 
 namespace SmartPlayer
 {
@@ -16,11 +17,18 @@ namespace SmartPlayer
 
         private bool isMediaOpen; // 是否已经打开文件
         private bool isPlaying; // 是否正在播放
+        private bool isPause; // 是否暂停
         private bool isFullScreen; // 是否全屏播放
         private double playSpeed; // 当前播放速率
 
         private bool forwardFlag; // 快进标识
         private bool reverseFlag; // 快退标识
+        private bool isStopped; // 是否停止
+
+        private List<FileInfo> playList; // 播放列表
+        private FileInfo curPlayItem; // 当前播放文件
+
+        private Thread featureExtractThread; // 特征抽取线程
 
         // 所有属性仅可读
         public double PlaySpeed
@@ -55,13 +63,23 @@ namespace SmartPlayer
             reverseFlag = false;
         }
 
-        public void playFile(string filepath)
+        public void setPlayList(List<FileInfo> playList)
         {
-            mPlayer.PlayFile(filepath);
+            this.playList = playList;
+        }
+
+        public void playFile(FileInfo file)
+        {
+            curPlayItem = file;
+            mPlayer.PlayFile(file.FullName);
             isMediaOpen = true;
             isPlaying = true;
             isFullScreen = false;
+            isStopped = false;
             playSpeed = 1;
+
+            featureExtractThread = new Thread(featureExtract);
+            featureExtractThread.Start();
         }
 
         public void play()
@@ -196,6 +214,18 @@ namespace SmartPlayer
         public void setVolume(int volume)
         {
             mPlayer.SetVolume(volume);
+        }
+
+        private void featureExtract()
+        {
+            while (!isStopped)
+            {
+                VideoInteractionFeature feature = new VideoInteractionFeature();
+                feature.play = this.isPlaying ? 1 : 0;
+                feature.pause = this.isPause ? 1 : 0;
+                feature.playRate = this.playSpeed;
+            }
+
         }
     }
 }

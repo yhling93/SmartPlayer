@@ -6,9 +6,27 @@ using System.Threading.Tasks;
 
 namespace SmartPlayer.Data.InteractionData
 {
-    class PauseEvent
+    // 暂停播放事件
+    class PauseEvent : Event
     {
-        public CustomTime happenTS { set; get; }
-        public PauseEvent() { }
+        public string mSessionID
+        {
+            get; set;
+        }
+
+        public CustomTime mHappenTS
+        {
+            get; set;
+        }
+
+        EventType Event.getEventType()
+        {
+            return EventType.PAUSE;
+        }
+
+        string Event.getJsonString()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

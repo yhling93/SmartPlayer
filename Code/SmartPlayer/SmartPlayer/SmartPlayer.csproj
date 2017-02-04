@@ -51,7 +51,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="libpxcclr.cs, Version=8.0.24.6528, Culture=neutral, PublicKeyToken=ca106b2214526f83, processorArchitecture=AMD64">
+    <Reference Include="libpxcclr.cs, Version=10.0.26.396, Culture=neutral, PublicKeyToken=ca106b2214526f83, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\libpxcclr.cs.dll</HintPath>
     </Reference>
@@ -87,14 +87,20 @@
   <ItemGroup>
     <Compile Include="Data\ContextData\SpeechSpeed.cs" />
     <Compile Include="Data\CustomTime.cs" />
-    <Compile Include="Data\InteractionData\InteractionEvent.cs" />
+    <Compile Include="Data\InteractionData\EventFactory.cs" />
+    <Compile Include="Data\InteractionData\FastEvent.cs" />
+    <Compile Include="Data\InteractionData\FullScreenEvent.cs" />
     <Compile Include="Data\InteractionData\PauseEvent.cs" />
-    <Compile Include="Data\InteractionData\PlaySpeedRecord.cs" />
+    <Compile Include="Data\InteractionData\PlayEvent.cs" />
+    <Compile Include="Data\InteractionData\SkipEvent.cs" />
+    <Compile Include="Data\InteractionData\StopEvent.cs" />
+    <Compile Include="Data\InteractionData\VideoInteractionFeature.cs" />
     <Compile Include="Data\RealSenseData\FacialExpression.cs" />
     <Compile Include="Data\RealSenseData\FacialLandmarks.cs" />
     <Compile Include="Data\RealSenseData\GestureData.cs" />
     <Compile Include="Data\RealSenseData\HandData.cs" />
     <Compile Include="Data\RealSenseData\HeadData.cs" />
+    <Compile Include="Data\Session.cs" />
     <Compile Include="DB\DBHelper.cs" />
     <Compile Include="DB\IDB.cs" />
     <Compile Include="MainForm.cs">
@@ -106,6 +112,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RealSense\TrackModule.cs" />
+    <Compile Include="Storage\IStore.cs" />
     <Compile Include="Test\DBHelperTest.cs" />
     <Compile Include="VideoModule.cs" />
     <Compile Include="VlcPlayer.cs" />

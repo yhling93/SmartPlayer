@@ -46,9 +46,9 @@ namespace SmartPlayer
             iniPlayList();
 
             //Sleep(200);
-            var thread = new Thread(Go);
-            thread.IsBackground = true;
-            thread.Start();
+            //var thread = new Thread(Go);
+            //thread.IsBackground = true;
+            //thread.Start();
         }
 
         /// <summary>
@@ -165,6 +165,7 @@ namespace SmartPlayer
             foreach (FileInfo file in playList)
                 videoListBox.Items.Add(file.Name);
             videoListBox.DoubleClick += PlayVideo_DoubleClick;
+            mVideoModule.setPlayList(playList);
         }
         /// <summary>
         /// 处理双击ListBox条目播放事件
@@ -174,7 +175,7 @@ namespace SmartPlayer
         private void PlayVideo_DoubleClick(object sender, EventArgs e)
         {
             int idx = (sender as ListBox).SelectedIndex;
-            mVideoModule.playFile(playList[idx].FullName);
+            mVideoModule.playFile(playList[idx]);
             normalBtn.Text = "暂停播放";
 
             videoProgressTrackBar.SetRange(0, mVideoModule.getVideoDuration());
