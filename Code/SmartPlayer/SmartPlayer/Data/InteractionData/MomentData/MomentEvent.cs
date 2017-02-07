@@ -9,7 +9,7 @@ namespace SmartPlayer.Data
     // 时刻行为枚举类
     public enum MomentEventType
     {
-        PLAY, PAUSE, STOP,
+        PLAY=10, PAUSE, STOP,
         FULL_SCREEN_ENTER, FULL_SCREEN_EXIT,
         PLAY_RATE_CHANGE
     }
@@ -24,11 +24,24 @@ namespace SmartPlayer.Data
         // 事件类型
         protected MomentEventType mType;
 
+        public string SessionID { get { return mSessionID; } }
+        
+        public CustomTime HappenTS { get { return mHappenTS; } }
+
+        public MomentEventType Type { get { return mType; } }
+
+        public MomentEvent() { }
+
         public MomentEvent(string sid, CustomTime happenTS, MomentEventType type)
         {
             this.mSessionID = sid;
             this.mHappenTS = happenTS;
             this.mType = type;
+        }
+
+        public string toJsonString()
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
     }
 }

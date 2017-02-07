@@ -18,11 +18,12 @@ namespace SmartPlayer
             Application.SetCompatibleTextRenderingDefault(false);
 
             PXCMSession session = PXCMSession.CreateInstance();
-            if(session!=null)
-            {
-                Application.Run(new MainForm(session));
-                session.Dispose();
-            }
+            Application.Run(new MainForm(null));
+            //if(session!=null)
+            //{
+            //    Application.Run(new MainForm(session));
+            //    session.Dispose();
+            //}
             
         }
     }

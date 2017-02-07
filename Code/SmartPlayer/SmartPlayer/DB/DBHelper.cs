@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SmartPlayer.Data.ContextData;
 using SmartPlayer.Data.InteractionData;
 using SmartPlayer.Data.RealSenseData;
 using System.Configuration;
@@ -33,7 +32,6 @@ namespace SmartPlayer.DB
 
             BsonSerializer.RegisterSerializer(new EnumSerializer<PXCMFaceData.LandmarksGroupType>(BsonType.String));
             BsonSerializer.RegisterSerializer(new EnumSerializer<PXCMFaceData.LandmarkType>(BsonType.String));
-            BsonSerializer.RegisterSerializer(new EnumSerializer<EventType>(BsonType.String));
             BsonSerializer.RegisterSerializer(new EnumSerializer<PXCMHandData.GestureStateType>(BsonType.String));
         }
 
@@ -70,16 +68,6 @@ namespace SmartPlayer.DB
         }
 
         public bool saveHeadData(HeadData headData)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool saveInteractionEvent(InteractionEvent interactionEvent)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool saveSpeechSpeed(SpeechSpeed speechSpeed)
         {
             throw new NotImplementedException();
         }

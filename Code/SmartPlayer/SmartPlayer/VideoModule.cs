@@ -9,6 +9,9 @@ using SmartPlayer.DB;
 using System.Threading;
 using System.IO;
 
+using Newtonsoft.Json;
+using SmartPlayer.Storage;
+
 namespace SmartPlayer
 {
     class VideoModule
@@ -30,17 +33,21 @@ namespace SmartPlayer
 
         private Thread featureExtractThread; // 特征抽取线程
 
+        private LearningSession curSession; // 当前会话
+
+        // 时段事件
+        private FastForwardEvent fastForwardEvent;
+        private RewindEvent rewindEvent;
+
         // 所有属性仅可读
         public double PlaySpeed
         {
             get { return this.playSpeed; }
         }
-
         public bool IsMediaOpen
         {
            get { return this.isMediaOpen; }
         }
-
         public bool IsPlaying
         {
             get { return this.isPlaying; }
@@ -49,6 +56,8 @@ namespace SmartPlayer
         {
             get { return this.isFullScreen; }
         }
+
+        private IStore storeModule;
 
         // 构造方法
         public VideoModule(VlcPlayer player)
@@ -61,6 +70,8 @@ namespace SmartPlayer
 
             forwardFlag = false;
             reverseFlag = false;
+
+            storeModule = FileStore.getFileStoreInstance();
         }
 
         public void setPlayList(List<FileInfo> playList)
@@ -68,8 +79,10 @@ namespace SmartPlayer
             this.playList = playList;
         }
 
-        public void playFile(FileInfo file)
+        public void playFile(FileInfo file, LearningSession session)
         {
+            curSession = session;
+
             curPlayItem = file;
             mPlayer.PlayFile(file.FullName);
             isMediaOpen = true;
@@ -80,22 +93,47 @@ namespace SmartPlayer
 
             featureExtractThread = new Thread(featureExtract);
             featureExtractThread.Start();
+
+            // 创建PlayEvent
+            PlayEvent e = (PlayEvent) EventFactory.createMomentEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), MomentEventType.PLAY);
+            storeModule.saveMomentEvent(e);
+            // For Debug
+            Console.WriteLine(JsonConvert.SerializeObject(e));
         }
 
         public void play()
         {
+            // 创建PlayEvent
+            PlayEvent e = (PlayEvent)EventFactory.createMomentEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), MomentEventType.PLAY);
+
+            storeModule.saveMomentEvent(e);
+            // For Debug
+            Console.WriteLine(JsonConvert.SerializeObject(e));
+
             mPlayer.Play();
             isPlaying = true;
         }
 
         public void pause()
         {
+            // 创建PauseEvent
+            PauseEvent e = (PauseEvent)EventFactory.createMomentEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), MomentEventType.PAUSE);
+
+            // For Debug
+            Console.WriteLine(JsonConvert.SerializeObject(e));
+
             mPlayer.Pause();
             isPlaying = false;
         }
 
         public void stopPlay()
         {
+            // 创建StopEvent
+            StopEvent e = (StopEvent)EventFactory.createMomentEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), MomentEventType.STOP);
+
+            // For Debug
+            Console.WriteLine(JsonConvert.SerializeObject(e));
+
             mPlayer.Stop();
             isPlaying = false;
         }
@@ -105,8 +143,19 @@ namespace SmartPlayer
             if(forwardFlag && !flag)
             {
                 forwardFlag = false;
+                EventFactory.finishPeriodEvent(fastForwardEvent, (int)mPlayer.GetPlayTime());
+                // for debug
+                Console.WriteLine(JsonConvert.SerializeObject(fastForwardEvent));
+
+                fastForwardEvent = null;
             } else if(!forwardFlag && flag)
             {
+                // 创建快进事件
+                fastForwardEvent = (FastForwardEvent) EventFactory.startPeriodEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), PeriodEventType.FAST_FORWARD);
+
+                // for debug
+                Console.WriteLine(JsonConvert.SerializeObject(fastForwardEvent));
+
                 forwardFlag = true;
                 Thread t = new Thread(forward);
                 t.Start();
@@ -137,9 +186,19 @@ namespace SmartPlayer
             if (reverseFlag && !flag)
             {
                 reverseFlag = false;
+                EventFactory.finishPeriodEvent(rewindEvent, (int)mPlayer.GetPlayTime());
+                // for debug
+                Console.WriteLine(JsonConvert.SerializeObject(rewindEvent));
+
+                rewindEvent = null;
             }
             else if (!reverseFlag && flag)
             {
+                // 创建快退事件
+                rewindEvent = (RewindEvent)EventFactory.startPeriodEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), PeriodEventType.REWIND);
+                // for debug
+                Console.WriteLine(JsonConvert.SerializeObject(rewindEvent));
+
                 reverseFlag = true;
                 Thread t = new Thread(reverse);
                 t.Start();
@@ -166,8 +225,50 @@ namespace SmartPlayer
             }
         }
 
+        private int skipStartVideoTS;
+        private int skipEndVideoTS;
+        // 一开始无法确定是前进还是后退，需要等待鼠标松开后才能确定
+        private UndeterminedSkipEvent undeterminedSkipEvent;
+
+        public void enterSkip()
+        {
+            skipStartVideoTS = getPlayTime();
+            undeterminedSkipEvent = (UndeterminedSkipEvent) EventFactory.startPeriodEvent(curSession.SessionID, skipStartVideoTS, PeriodEventType.UNDETERMINED);
+        }
+
+        public void quitSkip()
+        {
+            skipEndVideoTS = getPlayTime();
+            if(skipEndVideoTS > skipStartVideoTS)
+            {
+                ForwardSkipEvent forwardSkipEvent = new ForwardSkipEvent(undeterminedSkipEvent);
+                EventFactory.finishPeriodEvent(forwardSkipEvent, skipEndVideoTS);
+                
+                // for debug
+                Console.WriteLine(JsonConvert.SerializeObject(forwardSkipEvent));
+            } else if(skipEndVideoTS < skipStartVideoTS)
+            {
+                ReverseSkipEvent severseSkipEvent = new ReverseSkipEvent(undeterminedSkipEvent);
+                EventFactory.finishPeriodEvent(severseSkipEvent, skipEndVideoTS);
+
+                // for debug
+                Console.WriteLine(JsonConvert.SerializeObject(severseSkipEvent));
+            }
+            undeterminedSkipEvent = null;
+            skipStartVideoTS = 0;
+            skipEndVideoTS = 0;
+        }
+
         public int setPlayTime(int time)
         {
+            if(time - getPlayTime() >= 0)
+            {
+                // 设定时间减去当前时间大于0，则触发跳跃前进事件
+                ForwardSkipEvent e = (ForwardSkipEvent) EventFactory.startPeriodEvent(curSession.SessionID, getPlayTime(), PeriodEventType.FORWARD_SKIP);
+            } else if(time - getPlayTime() < 0)
+            {
+
+            }
             mPlayer.SetPlayTime(time);
             return (int)mPlayer.GetPlayTime();
         }
@@ -194,26 +295,64 @@ namespace SmartPlayer
         public void setFullScreen(bool flag)
         {
             isFullScreen = flag;
+            if(curSession != null) {
+                if (isFullScreen)
+                {
+                    // 创建进入全屏事件
+                    FullScreenEnterEvent e = (FullScreenEnterEvent) EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.FULL_SCREEN_ENTER);
+                    // for debug
+                    Console.WriteLine(JsonConvert.SerializeObject(e));
+                } else
+                {
+                    // 创建退出全屏事件
+                    FullScreenExitEvent e = (FullScreenExitEvent)EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.FULL_SCREEN_EXIT);
+                    // for debug
+                    Console.WriteLine(JsonConvert.SerializeObject(e));
+                }
+            }
         }
 
         public void fastSpeed()
         {
             mPlayer.SetRate(1.5f);
+            // 创建播放速率变化事件
+            PlayRateChangeEvent e = (PlayRateChangeEvent) EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.PLAY_RATE_CHANGE);
+            e.PlayRate = 1.5f;
+
+            // for debug
+            Console.WriteLine(JsonConvert.SerializeObject(e));
         }
 
         public void slowSpeed()
         {
             mPlayer.SetRate(0.5f);
+            // 创建播放速率变化事件
+            PlayRateChangeEvent e = (PlayRateChangeEvent)EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.PLAY_RATE_CHANGE);
+            e.PlayRate = 0.5f;
+
+            // for debug
+            Console.WriteLine(JsonConvert.SerializeObject(e));
         }
 
         public void normalSpeed()
         {
             mPlayer.SetRate(1f);
+            // 创建播放速率变化事件
+            PlayRateChangeEvent e = (PlayRateChangeEvent)EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.PLAY_RATE_CHANGE);
+            e.PlayRate = 1f;
+
+            // for debug
+            Console.WriteLine(JsonConvert.SerializeObject(e));
         }
 
         public void setVolume(int volume)
         {
             mPlayer.SetVolume(volume);
+        }
+
+        public void setSession(LearningSession session)
+        {
+            this.curSession = session;
         }
 
         private void featureExtract()

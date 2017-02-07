@@ -67,6 +67,10 @@
       <HintPath>..\packages\MongoDB.Driver.Core.2.4.0\lib\net45\MongoDB.Driver.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
@@ -85,22 +89,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\ContextData\SpeechSpeed.cs" />
     <Compile Include="Data\CustomTime.cs" />
     <Compile Include="Data\InteractionData\EventFactory.cs" />
-    <Compile Include="Data\InteractionData\FastEvent.cs" />
-    <Compile Include="Data\InteractionData\FullScreenEvent.cs" />
-    <Compile Include="Data\InteractionData\PauseEvent.cs" />
-    <Compile Include="Data\InteractionData\PlayEvent.cs" />
-    <Compile Include="Data\InteractionData\SkipEvent.cs" />
-    <Compile Include="Data\InteractionData\StopEvent.cs" />
+    <Compile Include="Data\InteractionData\PeriodData\FastForwardEvent.cs" />
+    <Compile Include="Data\InteractionData\MomentData\FullScreenEnterEvent.cs" />
+    <Compile Include="Data\InteractionData\MomentData\FullScreenExitEvent.cs" />
+    <Compile Include="Data\InteractionData\MomentData\PauseEvent.cs" />
+    <Compile Include="Data\InteractionData\MomentData\PlayEvent.cs" />
+    <Compile Include="Data\InteractionData\MomentData\PlayRateChangeEvent.cs" />
+    <Compile Include="Data\InteractionData\PeriodData\ForwardSkipEvent.cs" />
+    <Compile Include="Data\InteractionData\PeriodData\ReverseSkipEvent.cs" />
+    <Compile Include="Data\InteractionData\PeriodData\RewindEvent.cs" />
+    <Compile Include="Data\InteractionData\MomentData\StopEvent.cs" />
+    <Compile Include="Data\InteractionData\PeriodData\UndeterminedSkipEvent.cs" />
     <Compile Include="Data\InteractionData\VideoInteractionFeature.cs" />
+    <Compile Include="Data\InteractionData\MomentData\MomentEvent.cs" />
+    <Compile Include="Data\InteractionData\PeriodData\PeriodEvent.cs" />
     <Compile Include="Data\RealSenseData\FacialExpression.cs" />
     <Compile Include="Data\RealSenseData\FacialLandmarks.cs" />
     <Compile Include="Data\RealSenseData\GestureData.cs" />
     <Compile Include="Data\RealSenseData\HandData.cs" />
     <Compile Include="Data\RealSenseData\HeadData.cs" />
-    <Compile Include="Data\Session.cs" />
+    <Compile Include="Data\LearningSession.cs" />
     <Compile Include="DB\DBHelper.cs" />
     <Compile Include="DB\IDB.cs" />
     <Compile Include="MainForm.cs">
@@ -112,6 +122,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RealSense\TrackModule.cs" />
+    <Compile Include="Storage\FileStore.cs" />
     <Compile Include="Storage\IStore.cs" />
     <Compile Include="Test\DBHelperTest.cs" />
     <Compile Include="VideoModule.cs" />
@@ -168,6 +179,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

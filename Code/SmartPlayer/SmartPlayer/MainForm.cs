@@ -1,4 +1,5 @@
-﻿using SmartPlayer.RealSense;
+﻿using SmartPlayer.Data;
+using SmartPlayer.RealSense;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,6 +16,9 @@ namespace SmartPlayer
 {
     public partial class MainForm : Form
     {
+        // 学习过程的Session
+        public LearningSession learningSession;
+
         // RealSense需要,维护一个session
         public PXCMSession Session;
 
@@ -31,6 +35,10 @@ namespace SmartPlayer
         private VlcPlayer mVlcPlayer; // 播放器
         private VideoModule mVideoModule; // 处理视频交互事件的模块
         private List<FileInfo> playList; // 播放列表
+        private FileInfo curPlayFile; // 当前正在播放的文件
+
+        // 用户相关
+        private string username = "testUser";
 
         /// <summary>
         /// 主窗体
@@ -174,10 +182,25 @@ namespace SmartPlayer
         /// <param name="e"></param>
         private void PlayVideo_DoubleClick(object sender, EventArgs e)
         {
-            int idx = (sender as ListBox).SelectedIndex;
-            mVideoModule.playFile(playList[idx]);
-            normalBtn.Text = "暂停播放";
+            // 若上次会话尚未结束，首先清空上次会话
+            if(learningSession != null)
+            {
+                learningSession.closeSession();
+                // For Debug
+                Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
+                learningSession = null;
+            }
 
+            int idx = (sender as ListBox).SelectedIndex;
+            curPlayFile = playList[idx];
+
+            learningSession = LearningSession.createSession(curPlayFile.FullName, username);
+            // For Debug
+            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
+
+            mVideoModule.playFile(curPlayFile, learningSession);
+
+            normalBtn.Text = "暂停播放";
             videoProgressTrackBar.SetRange(0, mVideoModule.getVideoDuration());
             videoProgressTrackBar.Value = 0;
             videoProgressTimer.Start();
@@ -197,6 +220,14 @@ namespace SmartPlayer
                 normalBtn.Text = "正常播放";
             } else if(mVideoModule.IsMediaOpen)
             {
+                if(learningSession == null)
+                {
+                    // 如果用户之前停止播放本视频了，随后再次播放本视频，则需要新建一个LearningSession
+                    learningSession = LearningSession.createSession(curPlayFile.FullName, username);
+                    mVideoModule.setSession(learningSession);
+                    // For Debug
+                    Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
+                }
                 mVideoModule.play();
                 videoProgressTimer.Start();
                 normalBtn.Text = "暂停播放";
@@ -242,11 +273,17 @@ namespace SmartPlayer
         {
             if(mVideoModule.IsMediaOpen)
             {
+                learningSession.closeSession();
                 mVideoModule.stopPlay();
                 videoProgressTimer.Stop();
                 videoProgressTrackBar.Value = 0;
                 resetBtns();
                 videoProgressLabel.Text = string.Format("{0}/{1}", mVideoModule.getTimeString(0), mVideoModule.getTimeString(videoProgressTrackBar.Maximum));
+                
+                // For debug
+                Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
+
+                learningSession = null;
             }
         }
 
@@ -262,11 +299,45 @@ namespace SmartPlayer
             slowSpeedBtn.Enabled = true;
         }
 
+
         private void videoProgressTrackBar_Scroll(object sender, EventArgs e)
         {
             if(mVideoModule.IsPlaying)
             {
                 (sender as TrackBar).Value = mVideoModule.setPlayTime((sender as TrackBar).Value);
+            }
+        }
+
+        // 进度条进入拖拽事件
+        private void videoProgressTrackBar_MouseDown(object sender, MouseEventArgs e)
+        {
+            Console.WriteLine("TrackBar mouse down");
+            if (mVideoModule.IsPlaying)
+            {
+                mVideoModule.enterSkip();
+                // 真实的进度条有一定的边缘
+                int margin = 8;
+                int barWidth = videoProgressTrackBar.Size.Width - margin * 2;
+                int range = videoProgressTrackBar.Maximum;
+                if (e.X >= margin && e.X <= (videoProgressTrackBar.Size.Width - margin)) {
+                    double portion = (e.X - margin) * 1.0f / barWidth;
+                    int time = (int)(portion * range);
+                    (sender as TrackBar).Value = mVideoModule.setPlayTime(time);
+                    // for debug
+                    //Console.WriteLine("Range:" + range + "\n" +
+                    //    "Pportion:" + portion + "\n" +
+                    //    "Time:" + time);
+                }
+            }
+        }
+
+        // 进度条退出拖拽事件
+        private void videoProgressTrackBar_MouseUp(object sender, MouseEventArgs e)
+        {
+            Console.WriteLine("TrackBar mouse up");
+            if(mVideoModule.IsPlaying)
+            {
+                mVideoModule.quitSkip();
             }
         }
 

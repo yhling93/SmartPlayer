@@ -1,5 +1,4 @@
-﻿using SmartPlayer.Data.ContextData;
-using SmartPlayer.Data.InteractionData;
+﻿using SmartPlayer.Data.InteractionData;
 using SmartPlayer.Data.RealSenseData;
 using System;
 using System.Collections.Generic;
@@ -11,10 +10,6 @@ namespace SmartPlayer.DB
 {
     interface IDB
     {
-        bool saveSpeechSpeed(SpeechSpeed speechSpeed);
-
-        bool saveInteractionEvent(InteractionEvent interactionEvent);
-
         bool saveFacialExpression(FacialExpression facialExpression);
 
         bool saveFacialLandmarks(FacialLandmarks facialLandmarks);
