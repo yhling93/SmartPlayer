@@ -105,7 +105,6 @@ namespace SmartPlayer
         {
             // 创建PlayEvent
             PlayEvent e = (PlayEvent)EventFactory.createMomentEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), MomentEventType.PLAY);
-
             storeModule.saveMomentEvent(e);
             // For Debug
             Console.WriteLine(JsonConvert.SerializeObject(e));
@@ -118,7 +117,7 @@ namespace SmartPlayer
         {
             // 创建PauseEvent
             PauseEvent e = (PauseEvent)EventFactory.createMomentEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), MomentEventType.PAUSE);
-
+            storeModule.saveMomentEvent(e);
             // For Debug
             Console.WriteLine(JsonConvert.SerializeObject(e));
 
@@ -130,7 +129,7 @@ namespace SmartPlayer
         {
             // 创建StopEvent
             StopEvent e = (StopEvent)EventFactory.createMomentEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), MomentEventType.STOP);
-
+            storeModule.saveMomentEvent(e);
             // For Debug
             Console.WriteLine(JsonConvert.SerializeObject(e));
 
@@ -144,6 +143,7 @@ namespace SmartPlayer
             {
                 forwardFlag = false;
                 EventFactory.finishPeriodEvent(fastForwardEvent, (int)mPlayer.GetPlayTime());
+                storeModule.savePeriodEvent(fastForwardEvent);
                 // for debug
                 Console.WriteLine(JsonConvert.SerializeObject(fastForwardEvent));
 
@@ -187,6 +187,7 @@ namespace SmartPlayer
             {
                 reverseFlag = false;
                 EventFactory.finishPeriodEvent(rewindEvent, (int)mPlayer.GetPlayTime());
+                storeModule.savePeriodEvent(rewindEvent);
                 // for debug
                 Console.WriteLine(JsonConvert.SerializeObject(rewindEvent));
 
@@ -243,16 +244,16 @@ namespace SmartPlayer
             {
                 ForwardSkipEvent forwardSkipEvent = new ForwardSkipEvent(undeterminedSkipEvent);
                 EventFactory.finishPeriodEvent(forwardSkipEvent, skipEndVideoTS);
-                
+                storeModule.savePeriodEvent(forwardSkipEvent);
                 // for debug
                 Console.WriteLine(JsonConvert.SerializeObject(forwardSkipEvent));
             } else if(skipEndVideoTS < skipStartVideoTS)
             {
-                ReverseSkipEvent severseSkipEvent = new ReverseSkipEvent(undeterminedSkipEvent);
-                EventFactory.finishPeriodEvent(severseSkipEvent, skipEndVideoTS);
-
+                ReverseSkipEvent reverseSkipEvent = new ReverseSkipEvent(undeterminedSkipEvent);
+                EventFactory.finishPeriodEvent(reverseSkipEvent, skipEndVideoTS);
+                storeModule.savePeriodEvent(reverseSkipEvent);
                 // for debug
-                Console.WriteLine(JsonConvert.SerializeObject(severseSkipEvent));
+                Console.WriteLine(JsonConvert.SerializeObject(reverseSkipEvent));
             }
             undeterminedSkipEvent = null;
             skipStartVideoTS = 0;
@@ -318,7 +319,7 @@ namespace SmartPlayer
             // 创建播放速率变化事件
             PlayRateChangeEvent e = (PlayRateChangeEvent) EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.PLAY_RATE_CHANGE);
             e.PlayRate = 1.5f;
-
+            storeModule.saveMomentEvent(e);
             // for debug
             Console.WriteLine(JsonConvert.SerializeObject(e));
         }
@@ -329,6 +330,7 @@ namespace SmartPlayer
             // 创建播放速率变化事件
             PlayRateChangeEvent e = (PlayRateChangeEvent)EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.PLAY_RATE_CHANGE);
             e.PlayRate = 0.5f;
+            storeModule.saveMomentEvent(e);
 
             // for debug
             Console.WriteLine(JsonConvert.SerializeObject(e));
@@ -340,6 +342,7 @@ namespace SmartPlayer
             // 创建播放速率变化事件
             PlayRateChangeEvent e = (PlayRateChangeEvent)EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.PLAY_RATE_CHANGE);
             e.PlayRate = 1f;
+            storeModule.saveMomentEvent(e);
 
             // for debug
             Console.WriteLine(JsonConvert.SerializeObject(e));

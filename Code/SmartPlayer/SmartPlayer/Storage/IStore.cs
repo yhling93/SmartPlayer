@@ -10,10 +10,12 @@ namespace SmartPlayer.Storage
 {
     interface IStore
     {
+        void openSession(LearningSession s);
+
+        void closeSession(LearningSession s);
+
         void saveMomentEvent(MomentEvent e);
 
         void savePeriodEvent(PeriodEvent e);
-
-        void saveLearningSession(LearningSession ls);
     }
 }

@@ -12,7 +12,9 @@ namespace SmartPlayer.Storage
     {
         private static FileStore instance = new FileStore();
 
-        private StreamWriter sw;
+        private StreamWriter sessionSW;
+        private StreamWriter momentSW;
+        private StreamWriter periodSW;
         private string dataPath;
 
         public static FileStore getFileStoreInstance()
@@ -20,38 +22,69 @@ namespace SmartPlayer.Storage
             return instance;
         }
 
-        public FileStore()
+        private FileStore()
         {
             string curPath = Environment.CurrentDirectory;
             dataPath = curPath + "\\data\\";
         }
 
+        void IStore.openSession(LearningSession s)
+        {
+            lock(this)
+            {
+                if (!Directory.Exists(dataPath + s.SessionID)) Directory.CreateDirectory(dataPath + s.SessionID);
+                if (momentSW == null) momentSW = new StreamWriter(dataPath + s.SessionID + "\\moment", true);
+                if (periodSW == null) periodSW = new StreamWriter(dataPath + s.SessionID + "\\period", true);
+                if (sessionSW == null) sessionSW = new StreamWriter(dataPath + s.SessionID + "\\session", true);
+
+                sessionSW.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(s));
+                sessionSW.Flush();
+            }
+        }
+
+        void IStore.closeSession(LearningSession s)
+        {
+            if (momentSW != null)
+            {
+                momentSW.Flush();
+                momentSW.Close();
+                momentSW = null;
+            }
+
+            if (periodSW != null)
+            {
+                periodSW.Flush();
+                periodSW.Close();
+                periodSW = null;
+            }
+
+            if (sessionSW != null)
+            {
+                sessionSW.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(s));
+                sessionSW.Flush();
+                sessionSW.Close();
+                sessionSW = null;
+            }
+        }
         // 并发可能会出现问题？
         void IStore.saveMomentEvent(MomentEvent e)
         {
-            if (sw == null) sw = new StreamWriter(dataPath + e.SessionID, true);
-            sw.WriteLine(e.toJsonString());
-            sw.Flush();
+            lock(this)
+            {
+                momentSW.WriteLine(e.toJsonString());
+                momentSW.Flush();
+            }
+
         }
 
         // 并发可能会出现问题？
         void IStore.savePeriodEvent(PeriodEvent e)
         {
-            throw new NotImplementedException();
-        }
-
-        public void close()
-        {
-            if (sw != null)
+            lock (this)
             {
-                sw.Close();
-                sw = null;
+                periodSW.WriteLine(e.toJsonString());
+                periodSW.Flush();
             }
-        }
-
-        void IStore.saveLearningSession(LearningSession ls)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using SmartPlayer.Data;
 using SmartPlayer.RealSense;
+using SmartPlayer.Storage;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -40,6 +41,10 @@ namespace SmartPlayer
         // 用户相关
         private string username = "testUser";
 
+        // 持久化相关
+        private IStore mStoreModule;
+        private bool isOnline = false;
+
         /// <summary>
         /// 主窗体
         /// </summary>
@@ -52,6 +57,15 @@ namespace SmartPlayer
 
             iniVideoModule();
             iniPlayList();
+
+            if (!isOnline)
+            {
+                // 本地存储
+                mStoreModule = FileStore.getFileStoreInstance();
+            } else
+            {
+                // kafka+mongodb存储
+            }
 
             //Sleep(200);
             //var thread = new Thread(Go);
@@ -186,6 +200,7 @@ namespace SmartPlayer
             if(learningSession != null)
             {
                 learningSession.closeSession();
+                mStoreModule.closeSession(learningSession);
                 // For Debug
                 Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
                 learningSession = null;
@@ -195,6 +210,7 @@ namespace SmartPlayer
             curPlayFile = playList[idx];
 
             learningSession = LearningSession.createSession(curPlayFile.FullName, username);
+            mStoreModule.openSession(learningSession);
             // For Debug
             Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
 
@@ -282,6 +298,8 @@ namespace SmartPlayer
                 
                 // For debug
                 Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
+
+                mStoreModule.closeSession(learningSession);
 
                 learningSession = null;
             }
