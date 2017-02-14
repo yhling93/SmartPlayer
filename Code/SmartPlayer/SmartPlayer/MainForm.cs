@@ -81,7 +81,14 @@ namespace SmartPlayer
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Stopped = true;
-           
+
+            if (mVideoModule.IsPlaying)
+            {
+                mVideoModule.stopPlay();
+            }
+            mVideoModule.release();
+            closeSession();
+
         }
 
         /// <summary>
@@ -199,11 +206,12 @@ namespace SmartPlayer
             // 若上次会话尚未结束，首先清空上次会话
             if(learningSession != null)
             {
-                learningSession.closeSession();
-                mStoreModule.closeSession(learningSession);
-                // For Debug
-                Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
-                learningSession = null;
+                closeSession();
+                //learningSession.closeSession();
+                //mStoreModule.closeSession(learningSession);
+                //// For Debug
+                //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
+                //learningSession = null;
             }
 
             int idx = (sender as ListBox).SelectedIndex;
@@ -241,9 +249,11 @@ namespace SmartPlayer
                     // 如果用户之前停止播放本视频了，随后再次播放本视频，则需要新建一个LearningSession
                     learningSession = LearningSession.createSession(curPlayFile.FullName, username);
                     mVideoModule.setSession(learningSession);
+                    mStoreModule.openSession(learningSession);
                     // For Debug
                     Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
                 }
+                
                 mVideoModule.play();
                 videoProgressTimer.Start();
                 normalBtn.Text = "暂停播放";
@@ -289,19 +299,23 @@ namespace SmartPlayer
         {
             if(mVideoModule.IsMediaOpen)
             {
-                learningSession.closeSession();
+                // learningSession.closeSession();
+                // 点击结束按钮，关闭LearningSession
                 mVideoModule.stopPlay();
+                closeSession();
+
+                // update ui
                 videoProgressTimer.Stop();
                 videoProgressTrackBar.Value = 0;
                 resetBtns();
                 videoProgressLabel.Text = string.Format("{0}/{1}", mVideoModule.getTimeString(0), mVideoModule.getTimeString(videoProgressTrackBar.Maximum));
-                
+
                 // For debug
-                Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
+                // Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
 
-                mStoreModule.closeSession(learningSession);
+                // mStoreModule.closeSession(learningSession);
 
-                learningSession = null;
+                // learningSession = null;
             }
         }
 
@@ -365,7 +379,10 @@ namespace SmartPlayer
             {
                 if(videoProgressTrackBar.Value == videoProgressTrackBar.Maximum)
                 {
+                    // 播放自动结束，关闭LearningSession
                     mVideoModule.stopPlay();
+                    closeSession();
+
                     videoProgressTimer.Stop();
                     videoProgressTrackBar.Value = 0;
                     resetBtns();
@@ -395,5 +412,19 @@ namespace SmartPlayer
             mVideoModule.setVolume(videoVolumeTrackBar.Value);
         }
         /******************** 视频相关 ********************/
+
+        /**************** Learning Session ****************/
+        private void closeSession()
+        {
+            if (learningSession != null)
+            {
+                learningSession.closeSession();
+                mStoreModule.closeSession(learningSession);
+                // For Debug
+                Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
+                learningSession = null;
+            }
+        }
+        /**************** Learning Session ****************/
     }
 }

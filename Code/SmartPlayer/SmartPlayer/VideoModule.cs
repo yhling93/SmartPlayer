@@ -127,14 +127,17 @@ namespace SmartPlayer
 
         public void stopPlay()
         {
-            // 创建StopEvent
-            StopEvent e = (StopEvent)EventFactory.createMomentEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), MomentEventType.STOP);
-            storeModule.saveMomentEvent(e);
-            // For Debug
-            Console.WriteLine(JsonConvert.SerializeObject(e));
+            if (curSession != null)
+            {
+                // 创建StopEvent
+                StopEvent e = (StopEvent)EventFactory.createMomentEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), MomentEventType.STOP);
+                storeModule.saveMomentEvent(e);
+                // For Debug
+                Console.WriteLine(JsonConvert.SerializeObject(e));
 
-            mPlayer.Stop();
-            isPlaying = false;
+                mPlayer.Stop();
+                isPlaying = false;
+            }
         }
 
         public void fastForward(bool flag)
@@ -368,6 +371,11 @@ namespace SmartPlayer
                 feature.playRate = this.playSpeed;
             }
 
+        }
+
+        public void release()
+        {
+            mPlayer.release();
         }
     }
 }

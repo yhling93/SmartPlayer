@@ -111,6 +111,29 @@ namespace SmartPlayer
         {
             return LibVlcAPI.libvlc_media_player_get_rate(libvlc_media_player_);
         }
+
+        public void release()
+        {
+            try
+            {
+                if (libvlc_media_player_ != IntPtr.Zero ||
+                    libvlc_media_player_ != null)
+                {
+                    if (LibVlcAPI.libvlc_media_player_is_playing(libvlc_media_player_))
+                    {
+                        LibVlcAPI.libvlc_media_player_stop(libvlc_media_player_);
+                    }
+
+                    LibVlcAPI.libvlc_media_player_release(libvlc_media_player_);
+                }
+
+                libvlc_media_player_ = IntPtr.Zero;
+            }
+            catch (Exception)
+            {
+                libvlc_media_player_ = IntPtr.Zero;
+            }
+        }
     }
     internal static class LibVlcAPI
     {
@@ -301,6 +324,11 @@ namespace SmartPlayer
         [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         [SuppressUnmanagedCodeSecurity]
         public static extern float libvlc_media_player_get_rate(IntPtr libvlc_media_player);
+
+        //判断播放时是否在播放  
+        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        [SuppressUnmanagedCodeSecurity]
+        internal static extern bool libvlc_media_player_is_playing(IntPtr libvlc_media_player);
 
     }
 }
