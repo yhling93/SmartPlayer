@@ -217,10 +217,13 @@ namespace SmartPlayer
             int idx = (sender as ListBox).SelectedIndex;
             curPlayFile = playList[idx];
 
-            learningSession = LearningSession.createSession(curPlayFile.FullName, username);
-            mStoreModule.openSession(learningSession);
-            // For Debug
-            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
+
+            openSession(curPlayFile.FullName, username);
+            //learningSession = LearningSession.createSession(curPlayFile.FullName, username);
+            //mVideoModule.setSession(learningSession);
+            //mStoreModule.openSession(learningSession);
+            //// For Debug
+            //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
 
             mVideoModule.playFile(curPlayFile, learningSession);
 
@@ -247,11 +250,12 @@ namespace SmartPlayer
                 if(learningSession == null)
                 {
                     // 如果用户之前停止播放本视频了，随后再次播放本视频，则需要新建一个LearningSession
-                    learningSession = LearningSession.createSession(curPlayFile.FullName, username);
-                    mVideoModule.setSession(learningSession);
-                    mStoreModule.openSession(learningSession);
-                    // For Debug
-                    Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
+                    openSession(curPlayFile.FullName, username);
+                    //learningSession = LearningSession.createSession(curPlayFile.FullName, username);
+                    //mVideoModule.setSession(learningSession);
+                    //mStoreModule.openSession(learningSession);
+                    //// For Debug
+                    //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
                 }
                 
                 mVideoModule.play();
@@ -424,6 +428,13 @@ namespace SmartPlayer
                 Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
                 learningSession = null;
             }
+        }
+
+        private void openSession(string videoID, string username)
+        {
+            learningSession = LearningSession.createSession(videoID, username);
+            mVideoModule.setSession(learningSession);
+            mStoreModule.openSession(learningSession);
         }
         /**************** Learning Session ****************/
     }
