@@ -91,8 +91,8 @@ namespace SmartPlayer
             isStopped = false;
             playSpeed = 1;
 
-            featureExtractThread = new Thread(featureExtract);
-            featureExtractThread.Start();
+            //featureExtractThread = new Thread(featureExtract);
+            //featureExtractThread.Start();
 
             // 创建PlayEvent
             PlayEvent e = (PlayEvent) EventFactory.createMomentEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), MomentEventType.PLAY);
