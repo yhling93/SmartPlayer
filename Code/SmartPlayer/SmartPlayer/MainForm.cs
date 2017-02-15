@@ -215,6 +215,7 @@ namespace SmartPlayer
             }
 
             int idx = (sender as ListBox).SelectedIndex;
+            if (idx < 0) return;
             curPlayFile = playList[idx];
 
 
