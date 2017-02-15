@@ -9,13 +9,17 @@ using System.Windows.Forms;
 using SmartPlayer.DB;
 using SmartPlayer.Data.InteractionData;
 using SmartPlayer.Data.RealSenseData;
+using SmartPlayer.Storage;
 
 namespace SmartPlayer.RealSense
 {
     class TrackModule
     {
+        private bool isRecord = false;
+        public string filename = null;
 
         private DBHelper dbhelper;
+        private IStore mStoreModule;
         /// <summary>
         /// 窗体，用来令此窗口更新
         /// </summary>
@@ -39,6 +43,28 @@ namespace SmartPlayer.RealSense
             //ievent.happenTS.absTS = DateTime.Now;
             //ievent.happenTS.videoTS = 70;
             //dbhelper.saveEntity(ievent);
+        }
+
+        public void setRecordMode()
+        {
+            isRecord = true;
+        }
+
+        public void setRecordFileName()
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = @"RSSDK clip|*.rssdk|All files|*.*";
+            sfd.CheckPathExists = true;
+            sfd.OverwritePrompt = true;
+            try
+            {
+                filename = (sfd.ShowDialog() == DialogResult.OK) ? sfd.FileName : null;
+            }
+            catch
+            {
+                sfd.Dispose();
+            }
+            sfd.Dispose();
         }
 
         /// <summary>
@@ -82,6 +108,14 @@ namespace SmartPlayer.RealSense
 
             pp.Close();
             pp.Dispose();
+        }
+
+        /// <summary>
+        /// 录像，不做任何其他处理，将文件存储在filename中
+        /// </summary>
+        public void RecordPipeLine()
+        {
+
         }
 
         /// <summary>
