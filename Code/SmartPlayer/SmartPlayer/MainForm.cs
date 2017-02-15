@@ -193,15 +193,18 @@ namespace SmartPlayer
             playList = new List<FileInfo>(folder.GetFiles("*.mp4"));
             foreach (FileInfo file in playList)
                 videoListBox.Items.Add(file.Name);
-            videoListBox.DoubleClick += PlayVideo_DoubleClick;
+            videoListBox.MouseDoubleClick += new MouseEventHandler(PlayVideo_DoubleClick);
             mVideoModule.setPlayList(playList);
         }
+
+        private int curPlayIdx = -1;
+
         /// <summary>
         /// 处理双击ListBox条目播放事件
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void PlayVideo_DoubleClick(object sender, EventArgs e)
+        private void PlayVideo_DoubleClick(object sender, MouseEventArgs e)
         {
             // 若上次会话尚未结束，首先清空上次会话
             if(learningSession != null)
@@ -214,10 +217,18 @@ namespace SmartPlayer
                 //learningSession = null;
             }
 
-            int idx = (sender as ListBox).SelectedIndex;
-            if (idx < 0) return;
-            curPlayFile = playList[idx];
+            int idx = videoListBox.IndexFromPoint(e.Location);
+            if(idx == ListBox.NoMatches)
+            {
+                return;
+            }
+            videoListBox.SelectedIndex = idx;
+            //int idx = (sender as ListBox).SelectedIndex;
 
+
+
+            curPlayFile = playList[idx];
+            resetBtns();
 
             openSession(curPlayFile.FullName, username);
             //learningSession = LearningSession.createSession(curPlayFile.FullName, username);
