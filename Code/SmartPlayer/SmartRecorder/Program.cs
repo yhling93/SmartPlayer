@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SmartPlayer
+namespace SmartRecorder
 {
     static class Program
     {
@@ -18,13 +18,11 @@ namespace SmartPlayer
             Application.SetCompatibleTextRenderingDefault(false);
 
             PXCMSession session = PXCMSession.CreateInstance();
-            //Application.Run(new MainForm(null));
             if (session != null)
             {
                 Application.Run(new MainForm(session));
                 session.Dispose();
             }
-
         }
     }
 }

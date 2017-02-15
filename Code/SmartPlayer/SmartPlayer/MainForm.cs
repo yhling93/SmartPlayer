@@ -67,10 +67,10 @@ namespace SmartPlayer
                 // kafka+mongodb存储
             }
 
-            //Sleep(200);
-            //var thread = new Thread(Go);
-            //thread.IsBackground = true;
-            //thread.Start();
+            // Sleep(200);
+            var thread = new Thread(Go);
+            thread.IsBackground = true;
+            thread.Start();
         }
 
         /// <summary>
@@ -194,6 +194,7 @@ namespace SmartPlayer
             foreach (FileInfo file in playList)
                 videoListBox.Items.Add(file.Name);
             videoListBox.MouseDoubleClick += new MouseEventHandler(PlayVideo_DoubleClick);
+            
             mVideoModule.setPlayList(playList);
         }
 
@@ -206,6 +207,12 @@ namespace SmartPlayer
         /// <param name="e"></param>
         private void PlayVideo_DoubleClick(object sender, MouseEventArgs e)
         {
+
+            int idx = videoListBox.IndexFromPoint(e.Location);
+            if(idx == ListBox.NoMatches)
+            {
+                return;
+            }
             // 若上次会话尚未结束，首先清空上次会话
             if(learningSession != null)
             {
@@ -217,11 +224,6 @@ namespace SmartPlayer
                 //learningSession = null;
             }
 
-            int idx = videoListBox.IndexFromPoint(e.Location);
-            if(idx == ListBox.NoMatches)
-            {
-                return;
-            }
             videoListBox.SelectedIndex = idx;
             //int idx = (sender as ListBox).SelectedIndex;
 

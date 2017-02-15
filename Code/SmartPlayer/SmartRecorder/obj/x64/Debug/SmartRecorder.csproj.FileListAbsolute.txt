@@ -1,0 +1,11 @@
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartRecorder\bin\x64\Debug\SmartRecorder.exe.config
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartRecorder\bin\x64\Debug\SmartRecorder.exe
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartRecorder\bin\x64\Debug\SmartRecorder.pdb
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartRecorder\bin\x64\Debug\libpxcclr.cs.dll
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartRecorder\bin\x64\Debug\libsampledx.dll
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartRecorder\obj\x64\Debug\SmartRecorder.MainForm.resources
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartRecorder\obj\x64\Debug\SmartRecorder.Properties.Resources.resources
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartRecorder\obj\x64\Debug\SmartRecorder.csproj.GenerateResource.Cache
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartRecorder\obj\x64\Debug\SmartRecorder.exe
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartRecorder\obj\x64\Debug\SmartRecorder.pdb
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartRecorder\obj\x64\Debug\SmartRecorder.csprojResolveAssemblyReference.cache
