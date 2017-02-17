@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SmartRecorder
+namespace SmartPlayer
 {
     class RenderStreams
     {
@@ -71,14 +71,14 @@ namespace SmartRecorder
                         if (sm.AcquireFrame(true).IsError()) break;
 
                         /* Display images */
-                        PXCMCapture.Sample sample = sm.QuerySample();
+                        //PXCMCapture.Sample sample = sm.QuerySample();
 
                         /* Render streams */
-                        EventHandler<RenderFrameEventArgs> render = RenderFrame;
-                        PXCMImage image = null;                        
+                        //EventHandler<RenderFrameEventArgs> render = RenderFrame;
+                        //PXCMImage image = null;                        
 
-                        image = sample[PXCMCapture.StreamType.STREAM_TYPE_DEPTH];
-                        render(this, new RenderFrameEventArgs(0, image));
+                        //image = sample[PXCMCapture.StreamType.STREAM_TYPE_DEPTH];
+                        //render(this, new RenderFrameEventArgs(0, image));
                         
                        
                         sm.ReleaseFrame();

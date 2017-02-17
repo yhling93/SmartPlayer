@@ -142,7 +142,7 @@ namespace SmartPlayer
 
         public void fastForward(bool flag)
         {
-            if(forwardFlag && !flag)
+            if(this.isPlaying && forwardFlag && !flag)
             {
                 forwardFlag = false;
                 EventFactory.finishPeriodEvent(fastForwardEvent, (int)mPlayer.GetPlayTime());
@@ -151,7 +151,7 @@ namespace SmartPlayer
                 Console.WriteLine(JsonConvert.SerializeObject(fastForwardEvent));
 
                 fastForwardEvent = null;
-            } else if(!forwardFlag && flag)
+            } else if(this.isPlaying && !forwardFlag && flag)
             {
                 // 创建快进事件
                 fastForwardEvent = (FastForwardEvent) EventFactory.startPeriodEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), PeriodEventType.FAST_FORWARD);
@@ -186,7 +186,7 @@ namespace SmartPlayer
 
         public void fastReverse(bool flag)
         {
-            if (reverseFlag && !flag)
+            if (this.isPlaying && reverseFlag && !flag)
             {
                 reverseFlag = false;
                 EventFactory.finishPeriodEvent(rewindEvent, (int)mPlayer.GetPlayTime());
@@ -196,7 +196,7 @@ namespace SmartPlayer
 
                 rewindEvent = null;
             }
-            else if (!reverseFlag && flag)
+            else if (this.isPlaying && !reverseFlag && flag)
             {
                 // 创建快退事件
                 rewindEvent = (RewindEvent)EventFactory.startPeriodEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), PeriodEventType.REWIND);
@@ -318,37 +318,46 @@ namespace SmartPlayer
 
         public void fastSpeed()
         {
-            mPlayer.SetRate(1.5f);
-            // 创建播放速率变化事件
-            PlayRateChangeEvent e = (PlayRateChangeEvent) EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.PLAY_RATE_CHANGE);
-            e.PlayRate = 1.5f;
-            storeModule.saveMomentEvent(e);
-            // for debug
-            Console.WriteLine(JsonConvert.SerializeObject(e));
+            if (curSession != null)
+            {
+                mPlayer.SetRate(1.5f);
+                // 创建播放速率变化事件
+                PlayRateChangeEvent e = (PlayRateChangeEvent)EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.PLAY_RATE_CHANGE);
+                e.PlayRate = 1.5f;
+                storeModule.saveMomentEvent(e);
+                // for debug
+                Console.WriteLine(JsonConvert.SerializeObject(e));
+            }
         }
 
         public void slowSpeed()
         {
-            mPlayer.SetRate(0.5f);
-            // 创建播放速率变化事件
-            PlayRateChangeEvent e = (PlayRateChangeEvent)EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.PLAY_RATE_CHANGE);
-            e.PlayRate = 0.5f;
-            storeModule.saveMomentEvent(e);
+            if (curSession != null)
+            {
+                mPlayer.SetRate(0.5f);
+                // 创建播放速率变化事件
+                PlayRateChangeEvent e = (PlayRateChangeEvent)EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.PLAY_RATE_CHANGE);
+                e.PlayRate = 0.5f;
+                storeModule.saveMomentEvent(e);
 
-            // for debug
-            Console.WriteLine(JsonConvert.SerializeObject(e));
+                // for debug
+                Console.WriteLine(JsonConvert.SerializeObject(e));
+            }
         }
 
         public void normalSpeed()
         {
-            mPlayer.SetRate(1f);
-            // 创建播放速率变化事件
-            PlayRateChangeEvent e = (PlayRateChangeEvent)EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.PLAY_RATE_CHANGE);
-            e.PlayRate = 1f;
-            storeModule.saveMomentEvent(e);
+            if (curSession != null)
+            {
+                mPlayer.SetRate(1f);
+                // 创建播放速率变化事件
+                PlayRateChangeEvent e = (PlayRateChangeEvent)EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.PLAY_RATE_CHANGE);
+                e.PlayRate = 1f;
+                storeModule.saveMomentEvent(e);
 
-            // for debug
-            Console.WriteLine(JsonConvert.SerializeObject(e));
+                // for debug
+                Console.WriteLine(JsonConvert.SerializeObject(e));
+            }
         }
 
         public void setVolume(int volume)
@@ -359,18 +368,6 @@ namespace SmartPlayer
         public void setSession(LearningSession session)
         {
             this.curSession = session;
-        }
-
-        private void featureExtract()
-        {
-            while (!isStopped)
-            {
-                VideoInteractionFeature feature = new VideoInteractionFeature();
-                feature.play = this.isPlaying ? 1 : 0;
-                feature.pause = this.isPause ? 1 : 0;
-                feature.playRate = this.playSpeed;
-            }
-
         }
 
         public void release()

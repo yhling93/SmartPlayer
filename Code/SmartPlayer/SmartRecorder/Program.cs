@@ -14,8 +14,14 @@ namespace SmartRecorder
         [STAThread]
         static void Main()
         {
+
+            //MessageBox.Show("before create PXCMSession Instance1");
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+
+           // MessageBox.Show("before create PXCMSession Instance2");
 
             PXCMSession session = PXCMSession.CreateInstance();
             if (session != null)

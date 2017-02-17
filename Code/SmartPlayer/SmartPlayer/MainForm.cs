@@ -23,6 +23,9 @@ namespace SmartPlayer
         // RealSense需要,维护一个session
         public PXCMSession Session;
 
+        //record
+        private RenderStreams streaming = new RenderStreams();
+
         // m_bitmap的lock
         private readonly object m_bitmapLock = new object();
 
@@ -68,9 +71,9 @@ namespace SmartPlayer
             }
 
             // Sleep(200);
-            var thread = new Thread(Go);
-            thread.IsBackground = true;
-            thread.Start();
+            //var thread = new Thread(Go);
+            //thread.IsBackground = true;
+            //thread.Start();
         }
 
         /// <summary>
@@ -81,6 +84,7 @@ namespace SmartPlayer
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Stopped = true;
+            streaming.Stop = true;
 
             if (mVideoModule.IsPlaying)
             {
@@ -397,8 +401,13 @@ namespace SmartPlayer
             {
                 if(videoProgressTrackBar.Value == videoProgressTrackBar.Maximum)
                 {
+                    // 如果是快进结束的，需要处理
+                    mVideoModule.fastForward(false);
+
                     // 播放自动结束，关闭LearningSession
                     mVideoModule.stopPlay();
+
+
                     closeSession();
 
                     videoProgressTimer.Stop();
@@ -438,9 +447,19 @@ namespace SmartPlayer
             {
                 learningSession.closeSession();
                 mStoreModule.closeSession(learningSession);
+                mVideoModule.setSession(null);
                 // For Debug
                 Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
                 learningSession = null;
+            }
+
+            if(streaming.Stop==false)
+            {
+                streaming.Stop = true;
+            }
+            if(streaming.File!=null)
+            {
+                streaming.File = null;
             }
         }
 
@@ -449,6 +468,27 @@ namespace SmartPlayer
             learningSession = LearningSession.createSession(videoID, username);
             mVideoModule.setSession(learningSession);
             mStoreModule.openSession(learningSession);
+
+            string filename = System.Environment.CurrentDirectory + "\\data\\" + learningSession.SessionID + "\\record.rssdk";
+            streaming.Stop = false;
+            streaming.File = filename;
+            streaming.MarkAsRecord();
+            System.Threading.Thread thread = new System.Threading.Thread(DoStreaming);
+            thread.Start();
+            System.Threading.Thread.Sleep(5);
+        }
+
+        delegate void DoStreamingEnd();
+        private void DoStreaming()
+        {
+            streaming.StreamColorDepth();
+            //Close();
+            //Invoke(new DoStreamingEnd(
+            //    delegate
+            //    {
+            //        if (Stopped) Close();
+            //    }
+            //));
         }
         /**************** Learning Session ****************/
     }
