@@ -1,0 +1,13 @@
+F:\GitPath\SmartPlayer\Code\SmartPlayer\TestRealSense\bin\Release\TestRealSense.exe.config
+F:\GitPath\SmartPlayer\Code\SmartPlayer\TestRealSense\bin\Release\TestRealSense.exe
+F:\GitPath\SmartPlayer\Code\SmartPlayer\TestRealSense\bin\Release\TestRealSense.pdb
+F:\GitPath\SmartPlayer\Code\SmartPlayer\TestRealSense\bin\Release\RealSense.dll
+F:\GitPath\SmartPlayer\Code\SmartPlayer\TestRealSense\bin\Release\libpxcclr.cs.dll
+F:\GitPath\SmartPlayer\Code\SmartPlayer\TestRealSense\bin\Release\libsampledx.dll
+F:\GitPath\SmartPlayer\Code\SmartPlayer\TestRealSense\bin\Release\RealSense.pdb
+F:\GitPath\SmartPlayer\Code\SmartPlayer\TestRealSense\obj\Release\TestRealSense.csprojResolveAssemblyReference.cache
+F:\GitPath\SmartPlayer\Code\SmartPlayer\TestRealSense\obj\Release\TestRealSense.Form1.resources
+F:\GitPath\SmartPlayer\Code\SmartPlayer\TestRealSense\obj\Release\TestRealSense.Properties.Resources.resources
+F:\GitPath\SmartPlayer\Code\SmartPlayer\TestRealSense\obj\Release\TestRealSense.csproj.GenerateResource.Cache
+F:\GitPath\SmartPlayer\Code\SmartPlayer\TestRealSense\obj\Release\TestRealSense.exe
+F:\GitPath\SmartPlayer\Code\SmartPlayer\TestRealSense\obj\Release\TestRealSense.pdb

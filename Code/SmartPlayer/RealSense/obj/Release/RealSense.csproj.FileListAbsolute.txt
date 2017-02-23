@@ -1,0 +1,6 @@
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSense\bin\Release\RealSense.dll
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSense\bin\Release\RealSense.pdb
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSense\bin\Release\libpxcclr.cs.dll
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSense\bin\Release\libsampledx.dll
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSense\obj\Release\RealSense.dll
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSense\obj\Release\RealSense.pdb
