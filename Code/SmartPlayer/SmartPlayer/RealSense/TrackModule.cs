@@ -134,6 +134,8 @@ namespace SmartPlayer.RealSense
 
             // 面部初始化
             pp.EnableFace();
+
+
             PXCMFaceModule faceModule = pp.QueryFace();
             if(faceModule==null)
             {
@@ -235,8 +237,8 @@ namespace SmartPlayer.RealSense
 
                             // 存
                             PXCMFaceData.Face face = faceData.QueryFaceByIndex(0);
-                            //SaveFaceLandmarkData(face);
-                            //SaveFacialExpressionData(face);
+                            SaveFaceLandmarkData(face);
+                            SaveFacialExpressionData(face);
 
                             m_form.UpdatePic();
 

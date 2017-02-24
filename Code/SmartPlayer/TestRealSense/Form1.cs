@@ -13,11 +13,13 @@ namespace TestRealSense
 {
     public partial class Form1 : Form
     {
-        private RealSense.Stream rs = new RealSense.Stream(Stream.StreamOption.Color);
+        private RealSense.Stream rs;
 
         public Form1()
         {
-            InitializeComponent();
+            InitializeComponent(); 
+
+            rs = new RealSense.Stream(this, Stream.StreamOption.Color);
         }
 
         private void buttonStart_Click(object sender, EventArgs e)
@@ -38,6 +40,12 @@ namespace TestRealSense
         private void button1_Click(object sender, EventArgs e)
         {
             rs.CloseDisplay();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            RealSense.RealSenseData.FacialLandmarks fe = rs.GetFaceLandmarks();
+            MessageBox.Show((fe == null) ? "no landmarks" : fe.ToString());
         }
     }
 }
