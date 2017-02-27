@@ -6,8 +6,7 @@ import com.adam.Data.Session;
 import com.google.gson.Gson;
 
 import java.io.*;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Created by adam on 17-2-24.
@@ -15,7 +14,6 @@ import java.util.Queue;
 public class FeatureExtractor {
 
     private Session session;
-    private InteractionFeature feature;
 
     private FileReader sessionFr = null;
     private BufferedReader sessionBr = null;
@@ -23,13 +21,24 @@ public class FeatureExtractor {
     private BufferedReader momentBr = null;
     private FileReader periodFr = null;
     private BufferedReader periodBr = null;
+    private File featureFile = null;
+    private File sessionFile = null;
+    private File periodFile = null;
+    private File momentFile = null;
 
     private Gson gson;
 
+    private static long threshold = 2;
 
-    public FeatureExtractor(File sessionFile, File momentFile, File periodFile) {
-        initFeature();
+    private InteractionFeature[] features;
+    private int totalDuration;
+
+    public FeatureExtractor(File sessionFile, File momentFile, File periodFile, File featureFile) {
         gson = new Gson();
+        this.featureFile = featureFile;
+        this.sessionFile = sessionFile;
+        this.momentFile = momentFile;
+        this.periodFile = periodFile;
 
         try {
             sessionFr = new FileReader(sessionFile);
@@ -44,6 +53,10 @@ public class FeatureExtractor {
 
             periodFr = new FileReader(periodFile);
             periodBr = new BufferedReader(periodFr);
+
+            totalDuration = (int)(session.EndTime - session.StartTime);
+            features = new InteractionFeature[totalDuration];
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -60,151 +73,213 @@ public class FeatureExtractor {
         }
     }
 
-    public void startExtraction() {
-
-        String momentStr, periodStr;
-        long length = session.EndTime - session.StartTime;
-
+    /**
+     * ！！！ 暂时不用该函数！！！
+     * 功能：当一个事件的阈值秒之内发生了下一个事件且事件类型相同，将其合并为同一个事件
+     */
+    public void compressPeriodEvent() {
         try {
-            String lastMomentStr = momentBr.readLine();
-            String lastPeriodStr = periodBr.readLine();
+            String curPeriodStr = periodBr.readLine();
+            PeriodEvent curPeriodEvent = curPeriodStr == null ? null : gson.fromJson(curPeriodStr, PeriodEvent.class);
+            List<PeriodEvent> list = new ArrayList<PeriodEvent>();
+            if(curPeriodEvent != null) {
+                list.add(curPeriodEvent);
+            }
+            while((curPeriodStr = periodBr.readLine()) != null) {
+                curPeriodEvent = gson.fromJson(curPeriodStr, PeriodEvent.class);
 
-            MomentEvent lastMomentEvent = lastMomentStr == null ? null : gson.fromJson(lastMomentStr, MomentEvent.class);
-            PeriodEvent lastPeriodEvent = lastPeriodStr == null ? null : gson.fromJson(lastPeriodStr, PeriodEvent.class);
-
-            long curTime = session.StartTime;
-
-            Queue<MomentEvent> lastMomentQueue = new LinkedList<MomentEvent>();
-            Queue<PeriodEvent> lastPeriodEvents = new LinkedList<PeriodEvent>();
-
-            while(curTime != session.EndTime) {
-
-                while(lastMomentEvent != null && lastMomentEvent.HappenTS.absTS == curTime) {
-                    //handleMomentEvent(lastMomentEvent);
-                    lastMomentStr = momentBr.readLine();
-                    lastMomentEvent = lastMomentStr == null ? null : gson.fromJson(lastMomentStr, MomentEvent.class);
+                PeriodEvent lastPeriodEvent = list.get(list.size()-1);
+                // 如果当前发生事件距离上次发生事件时间小于阈值并且事件类型相同，则将他们合并成同一个事件
+                if(curPeriodEvent.StartTS.absTS - lastPeriodEvent.EndTS.absTS <= threshold
+                        && curPeriodEvent.Type == lastPeriodEvent.Type) {
+                    lastPeriodEvent.EndTS.absTS = curPeriodEvent.EndTS.absTS;
+                } else {
+                    list.add(curPeriodEvent);
                 }
-                while(lastPeriodEvent != null && lastPeriodEvent.StartTS.absTS == curTime) {
-                    handlePeriodEvent(lastPeriodEvent);
-                    System.out.println(curTime + " " + gson.toJson(feature));
-
-                    if(lastPeriodEvent != null && lastPeriodEvent.EndTS.absTS == curTime) {
-                        resetPeriodFeatures();
-                        lastPeriodStr = periodBr.readLine();
-                        lastPeriodEvent = lastPeriodStr == null ? null : gson.fromJson(lastPeriodStr, PeriodEvent.class);
-                    } else {
-                        break;
-                    }
-                }
-
-                curTime++;
             }
 
-            // genearte feature for every second
-//            for(long i = 0; i < length; i++) {
-//
-//                long now = i + session.StartTime;
-//
-//                // handle moment event
-//                if(lastMomentEvent != null && lastMomentEvent.HappenTS.absTS == now) {
-//                    handleMomentEvent(lastMomentEvent);
-//                    lastMomentStr = momentBr.readLine();
-//                    lastMomentEvent = lastMomentStr == null ? null : gson.fromJson(lastMomentStr, MomentEvent.class);
-//                } else if(lastMomentEvent != null && lastMomentEvent.HappenTS.absTS == now-1) {
-//
-//                }
-//
-//
-//                // handle period event
-//                if(lastPeriodEvent != null && lastPeriodEvent.StartTS.absTS == now ) {
-//                    handlePeriodEvent(lastPeriodEvent);
-//                }
-//                System.out.println(now + " " + gson.toJson(feature));
-//
-//                if(lastPeriodEvent != null && lastPeriodEvent.EndTS.absTS == now) {
-//                    // period event end
-//                    // reset params
-//                    resetPeriodFeatures();
-//                    lastPeriodStr = periodBr.readLine();
-//                    lastPeriodEvent = lastPeriodStr == null ? null : gson.fromJson(lastPeriodStr, PeriodEvent.class);
-//                }
-//
-//
-//            }
+            for(int i = 0; i < list.size(); i++) {
+                System.out.println(gson.toJson(list.get(i)));
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void initFeature() {
-        feature = new InteractionFeature();
-        feature.play = 0;
-        feature.pause = 0;
-        feature.fastForward = 0;
-        feature.rewind = 0;
-        feature.forwardSkip = 0;
-        feature.reverseSkip = 0;
-        feature.fullScreen = 0;
-        feature.playTime = 1;
-        feature.rate = 1.0f;
+    public void readPeriodEvent() {
+        try {
+            String curPeriodStr;
+            while ((curPeriodStr = periodBr.readLine()) != null) {
+                // 读取当前事件
+                PeriodEvent curPeriodEvent = gson.fromJson(curPeriodStr, PeriodEvent.class);
+                // 事件持续时间
+                int duration = (int)(curPeriodEvent.EndTS.absTS - curPeriodEvent.StartTS.absTS);
+                // 相对偏移位置
+                int idx = (int)(curPeriodEvent.StartTS.absTS - session.StartTime);
+                // 将[idx+i ~ idx+duration]时间段内的feature全部设置为当前事件应该有的属性
+                for(int i = 0; i <= duration; i++) {
+                    if(features[idx + i] == null) {
+                        features[idx + i] = new InteractionFeature();
+                    }
+                    // 处理事件
+                    handlePeriodEvent(curPeriodEvent, features[idx + i]);
+                }
+            }
+        } catch (Exception e) {
+
+        }
     }
 
-    private void handleMomentEvent(MomentEvent event) {
+    public void readMomentEvent() {
+        try {
+            // 根据定义：
+            // 第一个时刻事件永远是播放开始
+            // 最后一个时刻事件永远是播放停止
+
+            // 处理第一个事件
+            String curMomentStr = momentBr.readLine();
+            MomentEvent curMomentEvent = gson.fromJson(curMomentStr, MomentEvent.class);
+            if(features[0] == null) {
+                features[0] = new InteractionFeature();
+                features[0].rate = 1.0d;
+            }
+            handleMomentEvent(curMomentEvent, features[0]);
+
+            // 查看下一个事件，下一个事件不可能为空，因为至少会停止播放
+            String nextMomentStr = momentBr.readLine();
+            MomentEvent nextMomentEvent = gson.fromJson(nextMomentStr, MomentEvent.class);
+            int relativeHappenTS = (int) (nextMomentEvent.HappenTS.absTS - session.StartTime); // 事件发生时刻
+
+            for(int i = 0; i < totalDuration; i++) {
+                // 如果下一个事件发生时刻未到，则保持上一秒状态
+                if(i != relativeHappenTS && i != 0) {
+                    features[i] = InteractionFeature.createFeature(features[i-1]);
+                }
+
+                // 如果下一个事件发生时刻到了，则读取所有这一秒发生的事件并处理
+                while(i == relativeHappenTS) {
+                    // 如果此刻feature为空，先从上一秒复制一个feature（深拷贝）
+                    if(features[i] == null) {
+                        features[i] = InteractionFeature.createFeature(features[i-1]);
+                    }
+                    // 处理当前事件
+                    handleMomentEvent(nextMomentEvent, features[i]);
+                    // 读取下一个事件
+                    nextMomentStr = momentBr.readLine();
+                    nextMomentEvent = gson.fromJson(nextMomentStr, MomentEvent.class);
+                    relativeHappenTS = (int) (nextMomentEvent.HappenTS.absTS - session.StartTime);
+                }
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+    public void printFeature() {
+
+        FileOutputStream fileOutputStream = null;
+        BufferedOutputStream bufferedOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(featureFile);
+            bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+            StringBuilder sb;
+            for(int i = 0; i < features.length; i++) {
+                if(features[i] == null) {
+                    int now = (int) (session.StartTime + i);
+                    System.out.println(i + " " + gson.toJson(features[i-1]));
+                    return;
+                }
+                sb = new StringBuilder();
+                sb.append(features[i].play + " ");
+                sb.append(features[i].pause + " ");
+                sb.append(features[i].fastForward + " ");
+                sb.append(features[i].rewind + " ");
+                sb.append(features[i].forwardSkip + " ");
+                sb.append(features[i].reverseSkip + " ");
+                sb.append(features[i].fullScreen + " ");
+                sb.append(features[i].playTime + " ");
+                sb.append(features[i].rate + "\n");
+                bufferedOutputStream.write(sb.toString().getBytes());
+                bufferedOutputStream.flush();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            System.out.println(session.SessionID);
+            e.printStackTrace();
+        } finally {
+            try {
+                if (bufferedOutputStream != null) {
+                    bufferedOutputStream.flush();
+                    bufferedOutputStream.close();
+                }
+
+                if (fileOutputStream != null) {
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+//        for(int i = 0; i < features.length; i++) {
+//            int now = (int) (i + session.StartTime);
+//            System.out.println(now + gson.toJson(features[i]));
+//        }
+    }
+
+    private void handleMomentEvent(MomentEvent event, InteractionFeature pfeature) {
         switch (event.Type) {
             case 10:
                 // play
-                feature.play = 1;
-                feature.pause = 0;
+                pfeature.play = 1;
+                pfeature.pause = 0;
                 break;
             case 11:
                 // pause
-                feature.play = 0;
-                feature.pause = 1;
+                pfeature.play = 0;
+                pfeature.pause = 1;
                 break;
             case 12:
                 // stop
                 break;
             case 13:
                 // enter full screen
-                feature.fullScreen = 1;
+                pfeature.fullScreen = 1;
                 break;
             case 14:
                 // exit full screen
-                feature.fullScreen = 0;
+                pfeature.fullScreen = 0;
                 break;
             case 15:
                 // change play rate
-                feature.rate = event.PlayRate;
+                pfeature.rate = event.PlayRate;
                 break;
         }
     }
 
-    private void handlePeriodEvent(PeriodEvent event) {
+    private void handlePeriodEvent(PeriodEvent event, InteractionFeature pfeature) {
         switch (event.Type) {
             case 20:
                 // fast forward
-                feature.fastForward = 1;
+                pfeature.fastForward = 1;
                 break;
             case 21:
                 // rewind
-                feature.rewind = 1;
+                pfeature.rewind = 1;
                 break;
             case 22:
                 // forward skip
-                feature.forwardSkip = 1;
+                pfeature.forwardSkip = 1;
                 break;
             case 23:
                 // reverse skip
-                feature.reverseSkip = 1;
+                pfeature.reverseSkip = 1;
                 break;
         }
     }
-
-    private void resetPeriodFeatures() {
-        feature.fastForward = 0;
-        feature.rewind = 0;
-        feature.forwardSkip = 0;
-        feature.reverseSkip = 0;
-    }
-
 }
