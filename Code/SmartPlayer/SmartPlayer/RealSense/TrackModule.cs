@@ -80,7 +80,7 @@ namespace SmartPlayer.RealSense
                 throw new Exception("PXCMSenseManager null");
             }
 
-            pp.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_COLOR, 1920, 1080);
+            pp.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_COLOR, 640, 360);
 
             pp.Init();
 
@@ -130,10 +130,12 @@ namespace SmartPlayer.RealSense
                 throw new Exception("PXCMSenseManager null");
             }
 
-            pp.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_COLOR, 1920, 1080);
+            pp.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_COLOR, 640, 360);
 
             // 面部初始化
             pp.EnableFace();
+
+
             PXCMFaceModule faceModule = pp.QueryFace();
             if(faceModule==null)
             {
@@ -235,8 +237,8 @@ namespace SmartPlayer.RealSense
 
                             // 存
                             PXCMFaceData.Face face = faceData.QueryFaceByIndex(0);
-                            //SaveFaceLandmarkData(face);
-                            //SaveFacialExpressionData(face);
+                            SaveFaceLandmarkData(face);
+                            SaveFacialExpressionData(face);
 
                             m_form.UpdatePic();
 
@@ -266,7 +268,7 @@ namespace SmartPlayer.RealSense
                 throw new Exception("PXCMSenseManager null");
             }
 
-            pp.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_COLOR, 1920, 1080);
+            pp.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_COLOR, 640, 360);
 
             //手 初始化
             PXCMHandModule handAnalysis;
@@ -410,7 +412,7 @@ namespace SmartPlayer.RealSense
                 throw new Exception("PXCMSenseManager null");
             }
 
-            pp.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_COLOR, 1920, 1080);
+            pp.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_COLOR, 640, 360);
 
             // 面部初始化
             pp.EnableFace();

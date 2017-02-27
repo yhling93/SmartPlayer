@@ -34,6 +34,9 @@ namespace SmartRecorder
 
             render.SetHWND(picbox_Main);
 
+            streaming.File = "record.rssdk";
+            streaming.MarkAsRecord();
+
             button_stop.Enabled = false;
         }
 
