@@ -37,13 +37,11 @@
     <OutputPath>bin\Test\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="libpxcclr.cs, Version=8.0.24.6528, Culture=neutral, PublicKeyToken=ca106b2214526f83, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\Develop\Intel\RSSDK\bin\win32\libpxcclr.cs.dll</HintPath>
+    <Reference Include="libpxcclr.cs">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Intel\RSSDK\bin\win32\libpxcclr.cs.dll</HintPath>
     </Reference>
-    <Reference Include="libsampledx, Version=1.0.5870.13235, Culture=neutral, PublicKeyToken=d730df10a118b0de, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\Develop\Intel\RSSDK\bin\win32\libsampledx.dll</HintPath>
+    <Reference Include="libsampledx">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Intel\RSSDK\bin\win32\libsampledx.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

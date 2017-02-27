@@ -48,7 +48,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomTime.cs" />
     <Compile Include="event_args.cs" />
+    <Compile Include="RealSenseData\FacialExpression.cs" />
+    <Compile Include="RealSenseData\FacialLandmarks.cs" />
+    <Compile Include="RealSenseData\GestureData.cs" />
+    <Compile Include="RealSenseData\HandData.cs" />
+    <Compile Include="RealSenseData\HeadData.cs" />
     <Compile Include="Stream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
