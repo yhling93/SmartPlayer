@@ -104,10 +104,10 @@ namespace TestRealSense
                 Console.WriteLine(n);
             }
 
-            string[] dirs = new string[] { dirList[0] };
-            string[] fnames = new string[] { fnameList[0] };
-            rs.GenerateFaceData(dirs, fnames);
-            // rs.GenerateFaceData(dirList.ToArray(), fnameList.ToArray());
+            //string[] dirs = new string[] { dirList[0] };
+            //string[] fnames = new string[] { fnameList[0] };
+            //rs.GenerateFaceData(dirs, fnames);
+            rs.GenerateFaceData(dirList.ToArray(), fnameList.ToArray());
 
         }
 

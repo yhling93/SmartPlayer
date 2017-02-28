@@ -45,7 +45,7 @@
             // 
             this.pbMain.Location = new System.Drawing.Point(38, 59);
             this.pbMain.Name = "pbMain";
-            this.pbMain.Size = new System.Drawing.Size(183, 133);
+            this.pbMain.Size = new System.Drawing.Size(605, 349);
             this.pbMain.TabIndex = 0;
             this.pbMain.TabStop = false;
             // 
