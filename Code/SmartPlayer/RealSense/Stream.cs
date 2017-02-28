@@ -30,6 +30,9 @@ namespace RealSense
         private static D2D1Render render=new D2D1Render();
         private event EventHandler<RenderFrameEventArgs> RenderFrame = null;
         private long m_timestamp;
+        private long m_timestamp_sec;
+        private long m_timestamp_sec_last;
+        private long m_timestamp_sec_init=-1;
         private Label m_label;
 
         // 状态机的维护
@@ -160,6 +163,7 @@ namespace RealSense
         public void Pause()
         {
             this.m_pause = !this.m_pause;
+            this.manager.captureManager.SetPause(m_pause);
         }
 
         /// <summary>
@@ -341,12 +345,12 @@ namespace RealSense
 
             while (!m_stopped)
             {
-                if (m_pause)
-                {
-                    System.Threading.Thread.Sleep(10);
-                    continue;
-                }
-                if (manager.AcquireFrame(false).IsError()) { break; }
+                //if (m_pause)
+                //{
+                //    System.Threading.Thread.Sleep(10);
+                //    continue;
+                //}
+                if (manager.AcquireFrame(true).IsError()) { break; }
 
                 this.sample = manager.QuerySample();
 
@@ -355,11 +359,14 @@ namespace RealSense
                 else if (sample.color != null)
                     this.m_timestamp = sample.color.timeStamp;
 
+                m_timestamp_sec = m_timestamp / 10000000;
+                if (m_timestamp_sec_init == -1) { m_timestamp_sec_init = m_timestamp_sec; }
+
                 if (this.m_label != null)
                 {
                     //updateLabel(this.m_timestamp.ToString());
                     System.Threading.Thread t1 = new System.Threading.Thread(updateLabel);
-                    t1.Start(this.m_timestamp.ToString());
+                    t1.Start((m_timestamp_sec-m_timestamp_sec_init).ToString());
                 }
                     //OnTimeStampChanged(this.m_timestamp.ToString());
 
@@ -419,22 +426,32 @@ namespace RealSense
                 this.sample = manager.QuerySample();
                 //if (sample == null) { manager.ReleaseFrame(); continue; }
 
-                // 原生算法调用处理，并缓存实时数据
-                faceData.Update();
+                
 
-                fl = this.GetFaceLandmarks();
-                fe = this.GetExpression();
 
+                if (sample.depth != null)
+                    this.m_timestamp = (sample.depth.timeStamp);
+                else if (sample.color != null)
+                    this.m_timestamp = sample.color.timeStamp;
                
 
-               // buffer += fl.ToString() + fe.ToString();
-                if (fl != null)
-                    buffer += fl.ToString();
-                //console.writeline(fl.tostring());
-                if (fe != null)
-                    buffer += fe.ToString();
-                //console.writeline(fe.tostring());
-                buffer += "\n";
+                // 仅当下一秒时调用检测算法
+                m_timestamp_sec = m_timestamp / 10000000;
+                if(m_timestamp_sec!=m_timestamp_sec_last)
+                {
+                    // 原生算法调用处理，并缓存实时数据
+                    faceData.Update();
+
+                    fl = this.GetFaceLandmarks();
+                    fe = this.GetExpression();
+                    if (fl != null)
+                        buffer += fl.ToString();
+                    if (fe != null)
+                        buffer += fe.ToString();
+                    buffer += "\n";
+                    m_timestamp_sec_last = m_timestamp_sec;
+                    Console.WriteLine(m_timestamp_sec.ToString());
+                }
 
                 // 用于显示视频流功能
                 if (m_display) { this.DoRender(); }
@@ -525,7 +542,7 @@ namespace RealSense
                     else
                         manager.captureManager.SetFileName(recordPath, false);
 
-                    manager.captureManager.SetRealtime(true);
+                    //manager.captureManager.SetRealtime(true);
                     break;
             }
         }

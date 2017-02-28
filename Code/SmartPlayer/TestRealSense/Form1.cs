@@ -19,7 +19,7 @@ namespace TestRealSense
         {
             InitializeComponent();
 
-             rs = new RealSense.Stream(this, Stream.StreamOption.ColorAndDepth,Stream.AlgoOption.Face,Stream.RecordOption.Playback,this.lb_timestamp);
+            rs = new RealSense.Stream(this, Stream.StreamOption.ColorAndDepth,Stream.AlgoOption.Face,Stream.RecordOption.Playback,this.lb_timestamp);
             rs.TimeStampChanged += Rs_TimeStampChanged;
            // rs = new RealSense.Stream(this, Stream.StreamOption.Color, Stream.AlgoOption.Face, Stream.RecordOption.Live);
         }
