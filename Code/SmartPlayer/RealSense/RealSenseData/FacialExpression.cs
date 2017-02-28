@@ -45,5 +45,16 @@ namespace RealSense.RealSenseData
         {
             this.facialExpressionIndensity = new int[22];
         }
+
+        public override string ToString()
+        {
+            string res = "";
+            for (int i = 0; i < this.facialExpressionIndensity.Length; i++)
+            {
+                res += this.facialExpressionIndensity[i];
+                res += " ";
+            }
+            return res;
+        }
     }
 }

@@ -16,6 +16,8 @@ namespace RealSense.RealSenseData
         // 发生时间
         public CustomTime happenTS { set; get; }
 
+        private string SEPERATOR = " ";
+
         public FacialLandmarks()
         {
             this.landmarksData = new Dictionary<PXCMFaceData.LandmarksGroupType, PXCMPoint3DF32[]>();
@@ -23,7 +25,9 @@ namespace RealSense.RealSenseData
 
         public void updateData(PXCMFaceData.Face face)
         {
+            if (face == null) { return; }
             PXCMFaceData.LandmarksData ldata = face.QueryLandmarks();
+            if (ldata == null) { return; }
 
             // get the landmark data
             var landmarkGroupTypes = Enum.GetValues(typeof(PXCMFaceData.LandmarksGroupType)).Cast<PXCMFaceData.LandmarksGroupType>();
@@ -46,15 +50,25 @@ namespace RealSense.RealSenseData
             }
         }
 
-        public string ToString()
+        public override string ToString()
         {
             string res = "";
-            var result = string.Join(", ", this.landmarksData.Select(kvp => string.Join(")-(", kvp.Key,
-                string.Join(",", kvp.Value[0].x, kvp.Value[0].y, kvp.Value[0].z),
-                 string.Join(",", kvp.Value[1].x, kvp.Value[1].y, kvp.Value[1].z),
-                  string.Join(",", kvp.Value[2].x, kvp.Value[2].y, kvp.Value[2].z)
-                )));
-            return result;
+
+            PXCMPoint3DF32[] points;
+            PXCMPoint3DF32 p;
+            List< PXCMFaceData.LandmarksGroupType> keys= this.landmarksData.Keys.ToList();
+            foreach(PXCMFaceData.LandmarksGroupType k in keys)
+            {
+                points = this.landmarksData[k];
+                for(int i=0;i<points.Length;i++)
+                {
+                    p = points[i];
+                    res += p.x + SEPERATOR + p.y + SEPERATOR + p.z;
+                }
+                res += SEPERATOR;
+            }
+
+            return res;
         }
     }
 }

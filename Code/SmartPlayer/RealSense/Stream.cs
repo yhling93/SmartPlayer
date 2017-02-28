@@ -12,6 +12,9 @@ namespace RealSense
 {
     public class Stream
     {
+        public string PlaybackFile { get; set; }
+        public string PlaybackDir { get; set; }
+
         // 全局RealSense的管理
         private static PXCMSession session = PXCMSession.CreateInstance();
         private PXCMSenseManager manager;
@@ -26,11 +29,20 @@ namespace RealSense
         // 用于display
         private static D2D1Render render=new D2D1Render();
         private event EventHandler<RenderFrameEventArgs> RenderFrame = null;
-        
+        private long m_timestamp;
+        private Label m_label;
+
         // 状态机的维护
         private bool m_stopped = true;
         private bool m_display = false;
         private bool m_display_once = false;
+        private bool m_pause = false;
+        private bool m_showTS = false;
+        private bool m_openTS = false;
+        private bool m_recording = false;
+        private bool m_playback = false;
+
+        private string buffer = "";
 
         public bool Stopped
         {
@@ -71,6 +83,23 @@ namespace RealSense
         private AlgoOption m_algoOption;
         private StreamOption m_streamOption;
         private RecordOption m_recordOption;
+
+        /// <summary>
+        /// 本函数为Form添加FormClosingEvent,关闭窗口时关闭rs实例。构造函数依据Stream.***Option来使用
+        /// </summary>
+        /// <param name="so"></param>
+        public Stream(Form f, StreamOption so = StreamOption.None, AlgoOption ao = AlgoOption.Face, RecordOption ro = RecordOption.Record,Label lb=null)
+        {
+            m_algoOption = ao;
+            m_streamOption = so;
+            m_recordOption = ro;
+
+            m_label = lb;
+
+            f.FormClosing += new System.Windows.Forms.FormClosingEventHandler(FormClosingHandler);
+
+            InitPowerState();
+        }
 
         /// <summary>
         /// 本函数为Form添加FormClosingEvent,关闭窗口时关闭rs实例。构造函数依据Stream.***Option来使用
@@ -128,6 +157,11 @@ namespace RealSense
            
         }
 
+        public void Pause()
+        {
+            this.m_pause = !this.m_pause;
+        }
+
         /// <summary>
         /// 将流显示在窗口中，显示的流种类与初始化传入种类对应.仅支持单独的PictureBox
         /// </summary>
@@ -147,13 +181,27 @@ namespace RealSense
                 render.SetHWND(pb);
                 pb.Paint += new System.Windows.Forms.PaintEventHandler(PaintHandler);
                 pb.Resize += new EventHandler(ResizeHandler);
-
+                
                 this.m_display_once = true;
             }
 
             this.m_display = true;
             return true;
         }
+
+        //public void OpenTimeStamp(Label lb)
+        //{
+        //    if(this.m_showTS)
+        //    {
+        //        System.Windows.Forms.MessageBox.Show("Already Show TimeStamp");
+        //        return ;
+        //    }
+        //    if(!m_openTS)
+        //    {
+        //        //lb.Paint += new PaintEventHandler(LabelPaint);
+                
+        //    }
+        //}
 
         /// <summary>
         /// 关闭显示流功能，后台流获取不停止
@@ -179,7 +227,7 @@ namespace RealSense
                 return null;
             }
             this.face = this.faceData.QueryFaceByIndex(0);
-
+            
             FacialLandmarks flm = new FacialLandmarks();
             flm.updateData(face);
             return flm;
@@ -200,6 +248,7 @@ namespace RealSense
                 return null;
             }
             this.face = this.faceData.QueryFaceByIndex(0);
+            if (face == null) { return null; }
 
             FacialExpression fe = new FacialExpression();
             PXCMFaceData.ExpressionsData edata = face.QueryExpressions();
@@ -224,6 +273,37 @@ namespace RealSense
             }
 
             return fe;
+        }
+
+        //public bool StartPlayback(string filename)
+        //{
+        //    m_playback = true;
+        //    m_recording = false;
+        //    if (this.manager == null) { return false; }
+        //    manager.captureManager.SetFileName(filename, false);
+        //    return true;
+        //}
+
+        public void GenerateFaceData(string[] dirs,string [] fnames)
+        {
+            for (int i = 0; i < fnames.Length; i++)
+            {
+                this.PlaybackDir = dirs[i];
+                this.PlaybackFile = fnames[i];
+
+                //DoStreaming_SaveData();
+                DoStreaming_SaveData();
+                //System.Threading.Thread thread = new System.Threading.Thread(DoStreaming_SaveData);
+                //thread.Start();
+                //System.Threading.Thread.Sleep(5);
+
+                //thread.Join();
+
+                //Write File
+                this.WriteFile(buffer, this.PlaybackDir + "\\Facedata.md");
+                buffer = "";
+
+            }
         }
         
 
@@ -261,10 +341,28 @@ namespace RealSense
 
             while (!m_stopped)
             {
+                if (m_pause)
+                {
+                    System.Threading.Thread.Sleep(10);
+                    continue;
+                }
                 if (manager.AcquireFrame(false).IsError()) { break; }
 
                 this.sample = manager.QuerySample();
-                //if (sample == null) { manager.ReleaseFrame(); continue; }
+
+                if (sample.depth != null)
+                    this.m_timestamp = (sample.depth.timeStamp);
+                else if (sample.color != null)
+                    this.m_timestamp = sample.color.timeStamp;
+
+                if (this.m_label != null)
+                {
+                    //updateLabel(this.m_timestamp.ToString());
+                    System.Threading.Thread t1 = new System.Threading.Thread(updateLabel);
+                    t1.Start(this.m_timestamp.ToString());
+                }
+                    //OnTimeStampChanged(this.m_timestamp.ToString());
+
 
                 // 原生算法调用处理，并缓存实时数据
                 faceData.Update();
@@ -278,6 +376,88 @@ namespace RealSense
             manager.Dispose();
         }
 
+        // 循环执行流的主体程序
+        private void DoStreaming_SaveData()
+        {
+            this.m_stopped = false;
+            InitStreamState();
+
+            // 设置Playback模式
+            //manager.captureManager.SetFileName(this.PlaybackFile, false);
+
+
+            switch (m_algoOption)
+            {
+                // 面部算法
+                case AlgoOption.Face:
+                    this.faceModule = manager.QueryFace();
+                    if (faceModule == null) { MessageBox.Show("QueryFace failed"); return; }
+
+                    InitFaceState();
+
+                    this.faceData = this.faceModule.CreateOutput();
+                    if (faceData == null) { MessageBox.Show("CreateOutput failed"); return; }
+
+                    break;
+            }
+
+            if (manager.Init() < pxcmStatus.PXCM_STATUS_NO_ERROR)
+            {
+#if DEBUG
+                System.Windows.Forms.MessageBox.Show("init failed");
+#endif
+                return;
+            }
+
+            FacialLandmarks fl;
+            FacialExpression fe;
+
+            while (!m_stopped)
+            {
+                if (manager.AcquireFrame(false).IsError()) { break; }
+
+                this.sample = manager.QuerySample();
+                //if (sample == null) { manager.ReleaseFrame(); continue; }
+
+                // 原生算法调用处理，并缓存实时数据
+                faceData.Update();
+
+                fl = this.GetFaceLandmarks();
+                fe = this.GetExpression();
+
+               
+
+               // buffer += fl.ToString() + fe.ToString();
+                if (fl != null)
+                    buffer += fl.ToString();
+                //console.writeline(fl.tostring());
+                if (fe != null)
+                    buffer += fe.ToString();
+                //console.writeline(fe.tostring());
+                buffer += "\n";
+
+                // 用于显示视频流功能
+                if (m_display) { this.DoRender(); }
+
+                manager.ReleaseFrame();
+            }
+            faceData.Dispose();
+            manager.Dispose();
+
+        }
+
+        private void WriteFile(string str, string path)
+        {
+            System.IO.FileStream fs = new System.IO.FileStream(path, System.IO.FileMode.Create);
+            System.IO.StreamWriter sw = new System.IO.StreamWriter(fs);
+            //开始写入
+            sw.Write(str);
+            //清空缓冲区
+            sw.Flush();
+            //关闭流
+            sw.Close();
+            fs.Close();
+        }
 
         //*********************************初始化函数(初始化各种杂乱的参数)*******************************************************************
 
@@ -307,13 +487,18 @@ namespace RealSense
             switch (m_streamOption)
             {
                 case StreamOption.Color:
-                    manager.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_COLOR, 640, 360);
+                    //manager.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_COLOR, 640, 360);
+                    manager.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_COLOR, 1920, 1080);
                     break;
                 case StreamOption.Depth:
                     manager.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_DEPTH, 640, 480);
                     break;
                 case StreamOption.IR:
                     manager.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_IR, 640, 480);
+                    break;
+                case StreamOption.ColorAndDepth:
+                    manager.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_DEPTH, 640, 480);
+                    manager.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_COLOR, 1920, 1080);
                     break;
                 default:
                     break;
@@ -335,7 +520,12 @@ namespace RealSense
                     manager.captureManager.SetFileName(recordPath, true);
                     break;
                 case RecordOption.Playback:
-                    manager.captureManager.SetFileName(recordPath, true);
+                    if(this.PlaybackFile!=null)
+                        manager.captureManager.SetFileName(this.PlaybackFile, false);
+                    else
+                        manager.captureManager.SetFileName(recordPath, false);
+
+                    manager.captureManager.SetRealtime(true);
                     break;
             }
         }
@@ -418,6 +608,28 @@ namespace RealSense
 
         //*********************************回调函数（图像渲染、窗口关闭）*******************************************************************
 
+        private void updateLabel(object  content)
+        {
+            if(this.m_label.InvokeRequired)
+            {
+                Action<string> actionDelegate = (x) => { this.m_label.Text = content.ToString(); };
+                if(m_label!=null)
+                    this.m_label.Invoke(actionDelegate, content);
+            }
+            else
+            {
+                this.m_label.Text = content.ToString();
+            }
+        }
+
+        public delegate void LabelHandler(string newTimeStamp);
+        public event LabelHandler TimeStampChanged;
+
+        protected void OnTimeStampChanged(string newTimeStamp)
+        {
+            TimeStampChanged(newTimeStamp);
+        }
+
         /* Redirect to DirectX Update */
         private void PaintHandler(object sender, System.Windows.Forms.PaintEventArgs e)
         {
@@ -446,9 +658,14 @@ namespace RealSense
                 case StreamOption.IR:
                     image = sample.ir;
                     break;
+                case StreamOption.ColorAndDepth:
+                    image = sample.color;
+                    break;
             }
             renderLocal(this, new RenderFrameEventArgs(0, image));
         }
+
+        
 
         // Render Frame Handler, just update from e.image
         private void RenderFrameHandler(Object sender, RenderFrameEventArgs e)
