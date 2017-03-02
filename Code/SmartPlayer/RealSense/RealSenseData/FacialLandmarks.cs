@@ -63,12 +63,26 @@ namespace RealSense.RealSenseData
                 for(int i=0;i<points.Length;i++)
                 {
                     p = points[i];
-                    res += p.x + SEPERATOR + p.y + SEPERATOR + p.z;
+                    res += p.x + SEPERATOR + p.y + SEPERATOR + p.z + SEPERATOR;
                 }
                 res += SEPERATOR;
             }
 
             return res;
+        }
+
+        public static string generateBlank()
+        {
+            string res = "";
+
+            for(int i=0;i<33*3;i++)
+            {
+                res += "0" + " ";
+            }
+
+            
+            return res;
+
         }
     }
 }

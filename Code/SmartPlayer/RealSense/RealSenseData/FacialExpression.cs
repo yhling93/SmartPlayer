@@ -56,5 +56,16 @@ namespace RealSense.RealSenseData
             }
             return res;
         }
+
+        public static string generateBlank()
+        {
+            string res = "";
+            for (int i = 0; i < 22; i++)
+            {
+                res += 0;
+                res += " ";
+            }
+            return res;
+        }
     }
 }

@@ -31,7 +31,7 @@ namespace RealSense
         private event EventHandler<RenderFrameEventArgs> RenderFrame = null;
         private long m_timestamp;
         private long m_timestamp_sec;
-        private long m_timestamp_sec_last;
+        private long m_timestamp_sec_last=-1;
         private long m_timestamp_sec_init=-1;
         private Label m_label;
 
@@ -449,32 +449,75 @@ namespace RealSense
                 this.sample = manager.QuerySample();
                 //if (sample == null) { manager.ReleaseFrame(); continue; }
 
-                
+
 
 
                 if (sample.depth != null)
                     this.m_timestamp = (sample.depth.timeStamp);
                 else if (sample.color != null)
                     this.m_timestamp = sample.color.timeStamp;
+                else
+                    continue;
                
 
                 // 仅当下一秒时调用检测算法
                 m_timestamp_sec = m_timestamp / 10000000;
-                if(m_timestamp_sec!=m_timestamp_sec_last)
+
+                if (m_timestamp_sec_init == -1) { m_timestamp_sec_init = m_timestamp_sec; }
+                if (m_timestamp_sec_last==-1)
                 {
+                    m_timestamp_sec_last = m_timestamp_sec - 1;
+                }
+                long interval = m_timestamp_sec - m_timestamp_sec_last;
+                if (interval>0)
+                {
+                    if(interval>1)
+                    {
+                        for(int i=1;i<interval;i++)
+                        {
+                            buffer += (m_timestamp_sec_last + i - m_timestamp_sec_init).ToString() + " ";
+                            buffer += "\n";
+                            Console.WriteLine((m_timestamp_sec_last + i - m_timestamp_sec_init).ToString());
+                        }
+                    }
+
+                    buffer += (m_timestamp_sec - m_timestamp_sec_init).ToString()+" ";
+
                     // 原生算法调用处理，并缓存实时数据
                     faceData.Update();
 
                     fl = this.GetFaceLandmarks();
                     fe = this.GetExpression();
+
                     if (fl != null)
                         buffer += fl.ToString();
+                    else
+                        buffer += FacialLandmarks.generateBlank();
                     if (fe != null)
                         buffer += fe.ToString();
+                    else
+                        buffer += FacialExpression.generateBlank();
+
                     buffer += "\n";
                     m_timestamp_sec_last = m_timestamp_sec;
-                    Console.WriteLine(m_timestamp_sec.ToString());
+                    Console.WriteLine((m_timestamp_sec- m_timestamp_sec_init).ToString());
                 }
+
+                //if(m_timestamp_sec>m_timestamp_sec_last)
+                //{
+                //    // 原生算法调用处理，并缓存实时数据
+                //    faceData.Update();
+
+                //    fl = this.GetFaceLandmarks();
+                //    fe = this.GetExpression();
+                //    if (fl != null)
+                //        buffer += fl.ToString();
+                //    if (fe != null)
+                //        buffer += fe.ToString();
+                //    buffer += "\n";
+                //    m_timestamp_sec_last = m_timestamp_sec;
+                //    Console.WriteLine(m_timestamp_sec.ToString());
+                //}
 
                 // 用于显示视频流功能
                 if (m_display) { this.DoRender(); }
@@ -641,6 +684,7 @@ namespace RealSense
                         manager.captureManager.SetFileName(this.PlaybackFile, false);
                     else
                         manager.captureManager.SetFileName(recordPath, false);
+                    manager.captureManager.SetRealtime(false);
 
                     if(m_playback_byframe)
                     {
