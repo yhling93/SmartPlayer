@@ -1,0 +1,13 @@
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSensePlayer\bin\Debug\RealSensePlayer.exe.config
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSensePlayer\obj\Debug\RealSensePlayer.csprojResolveAssemblyReference.cache
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSensePlayer\obj\Debug\RealSensePlayer.Form1.resources
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSensePlayer\obj\Debug\RealSensePlayer.Properties.Resources.resources
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSensePlayer\obj\Debug\RealSensePlayer.csproj.GenerateResource.Cache
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSensePlayer\bin\Debug\RealSensePlayer.exe
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSensePlayer\bin\Debug\RealSensePlayer.pdb
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSensePlayer\bin\Debug\RealSense.dll
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSensePlayer\bin\Debug\libpxcclr.cs.dll
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSensePlayer\bin\Debug\libsampledx.dll
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSensePlayer\bin\Debug\RealSense.pdb
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSensePlayer\obj\Debug\RealSensePlayer.exe
+F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSensePlayer\obj\Debug\RealSensePlayer.pdb

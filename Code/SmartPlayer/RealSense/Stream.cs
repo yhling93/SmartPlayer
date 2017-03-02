@@ -44,6 +44,9 @@ namespace RealSense
         private bool m_openTS = false;
         private bool m_recording = false;
         private bool m_playback = false;
+        private bool m_playback_byframe = false;
+        private int m_playback_framespeed = 1;
+        private bool m_playback_reverse = false;
 
         private string buffer = "";
 
@@ -163,7 +166,8 @@ namespace RealSense
         public void Pause()
         {
             this.m_pause = !this.m_pause;
-            this.manager.captureManager.SetPause(m_pause);
+            if (m_playback_byframe) { }
+            else { this.manager.captureManager.SetPause(m_pause); }           
         }
 
         /// <summary>
@@ -310,6 +314,25 @@ namespace RealSense
             }
         }
         
+        public void PlayByFrameIndex(string filename)
+        {
+            this.PlaybackFile = filename;
+            this.m_playback_byframe = true;
+
+            System.Threading.Thread thread = new System.Threading.Thread(PlaybackStreaming_PlayByFrameIndex);
+            thread.Start();
+            System.Threading.Thread.Sleep(5);
+        }
+
+        public void updateFrameSpeed(int speed)
+        {
+            this.m_playback_framespeed = speed;
+        }
+
+        public void ReversePlay()
+        {
+            this.m_playback_reverse = !m_playback_reverse;
+        }
 
         //*********************************私有函数*******************************************************************
 
@@ -463,6 +486,83 @@ namespace RealSense
 
         }
 
+        private void PlaybackStreaming_PlayByFrameIndex()
+        {
+            this.m_stopped = false;
+            InitStreamState();
+
+            
+
+            switch (m_algoOption)
+            {
+                // 面部算法
+                case AlgoOption.Face:
+                    this.faceModule = manager.QueryFace();
+                    if (faceModule == null) { MessageBox.Show("QueryFace failed"); return; }
+
+                    InitFaceState();
+
+                    this.faceData = this.faceModule.CreateOutput();
+                    if (faceData == null) { MessageBox.Show("CreateOutput failed"); return; }
+
+                    break;
+            }
+
+            if (manager.Init() < pxcmStatus.PXCM_STATUS_NO_ERROR)
+            {
+#if DEBUG
+                System.Windows.Forms.MessageBox.Show("init failed");
+#endif
+                return;
+            }
+
+            int nframes = manager.captureManager.QueryNumberOfFrames();
+            MessageBox.Show(nframes+"");
+            for(int i=0;;)
+            {
+                if (m_pause) { continue; }
+                manager.captureManager.SetFrameByIndex(i);
+                manager.FlushFrame();
+
+                if (manager.AcquireFrame(true).IsError()) { break; }
+
+                this.sample = manager.QuerySample();
+
+                if (sample.depth != null)
+                    this.m_timestamp = (sample.depth.timeStamp);
+                else if (sample.color != null)
+                    this.m_timestamp = sample.color.timeStamp;
+
+                m_timestamp_sec = m_timestamp / 10000000;
+                if (m_timestamp_sec_init == -1) { m_timestamp_sec_init = m_timestamp_sec; }
+
+                if (this.m_label != null)
+                {
+                    //updateLabel(this.m_timestamp.ToString());
+                    System.Threading.Thread t1 = new System.Threading.Thread(updateLabel);
+                    t1.Start((m_timestamp_sec - m_timestamp_sec_init).ToString());
+                }
+
+                if (m_display) { this.DoRender(); }
+
+                manager.ReleaseFrame();
+
+                if(this.m_playback_reverse)
+                {
+                    if(i<= this.m_playback_framespeed) { break; }
+                    i -= this.m_playback_framespeed;
+                }
+                else
+                {
+                    if (i >= nframes-this.m_playback_framespeed) { break; }
+                    i += this.m_playback_framespeed;
+                }
+            }
+            
+            faceData.Dispose();
+            manager.Dispose();
+        }
+
         private void WriteFile(string str, string path)
         {
             System.IO.FileStream fs = new System.IO.FileStream(path, System.IO.FileMode.Create);
@@ -542,6 +642,11 @@ namespace RealSense
                     else
                         manager.captureManager.SetFileName(recordPath, false);
 
+                    if(m_playback_byframe)
+                    {
+                        manager.captureManager.SetRealtime(false);
+                        manager.captureManager.SetPause(true);
+                    }
                     //manager.captureManager.SetRealtime(true);
                     break;
             }
