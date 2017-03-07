@@ -1,4 +1,5 @@
 import re
+
 def handle_interaction(interactionLines, target):
     for line in interactionLines:
         curfeature = line.split( )
@@ -8,7 +9,7 @@ def handle_interaction(interactionLines, target):
         target.append(toStr)
     return
 
-def handle_face(faceLines, target, count):
+def handle_face(faceLines, target, count, canUse):
     if count > len(faceLines):
         for i in range(0, count - len(faceLines)):
             faceLines.insert(0,'')
@@ -19,70 +20,114 @@ def handle_face(faceLines, target, count):
         #print(str(i) + ' ' + str(len(curfeature)) + '\n')
         # total 121 feature
         if len(curfeature) < 258:
+            # if feature doesn't meet requirement, set the can use flag to be false
+            canUse[i] = False
             for j in range(0, 256):
-                target[i] += str(j + 9) + ':0 '
+                if not j == 255:
+                    target[i] += str(j + 9) + ':0 '
+                elif j == 255:
+                    target[i] += str(j + 9) + ':0'
         elif len(curfeature) == 258:
+            # if feature doesn't meet requirement, set the can use flag to be false
+            canUse[i] = check_face_feature(curfeature)
+            print str(i) + "can use ?" + str(canUse[i])
             for j in range(1, 257):
-                target[i] += str(j + 9 - 1) + ':' + curfeature[j] + ' '
+                if not j == 256:
+                    target[i] += str(j + 9 - 1) + ':' + curfeature[j] + ' '
+                elif j == 256:
+                    target[i] += str(j + 9 - 1) + ':' + curfeature[j]
     return
 
+
+def check_face_feature(curfeature):
+    # if the number of zeros > half of the features, then this feature is invalid
+    count = 256
+    zeroCount = 0
+    for i in range(1, 257):
+        if curfeature[i] == 0:
+            zeroCount += 1
+
+    rate = 1.0 * zeroCount / count
+    return rate < 0.5
 
 labelmap={'amused':1,'tired':2,'despise':3,'thinking':4,'notetaking':5,'confused':6,'surprised':7,'distracted':8,'normal':9,'unknown':10,'concentrated':11}
 def handle_label(labels, target, count):
    
     last_time=0
     line = labels[0]
-    labelfeature= re.split('\s+',line);
+    labelfeature= re.split('\s+',line)
 
-    for ts in range(0,3):
-        target[ts]='10 '+target[ts]
-        print '10 '
-    for ts in range(0,int(labelfeature[0])):
-        target[ts+4-1]='10 '+target[ts+4-1]
-        print '10 '
+    # get the start play time
+    startPlayTime = int(labelfeature[0])
+    # set the label unknow from 0 to startPlayTime
+    for ts in range(0, startPlayTime + 1):
+        target[ts] = '10 ' + target[ts]
 
+    last_time = startPlayTime
+ 
     for i in range(1 , len(labels) - 1):
 
-        line=labels[i]
+        # get the label line
+        line = labels[i]
 
         labelfeature = re.split('\s+',line)
         time_period = labelfeature[0].split('-')
+
+        # get start time and end time
         st_time = int(time_period[0])
-        end_time= int(time_period[1])
-        cur_label=[]
-        cur_label_str=''
+        end_time = int(time_period[1])
+
+        # get label array
+        cur_label = []
+        cur_label_str = ''
         for key in labelmap:
-            if line.find(key) > 0:
+            # if find label str, than add label the to array
+            if line.find(key) >= 0:
                 cur_label.append(labelmap[key])
-        print len(cur_label)
-        for label_i in range(0,len(cur_label)-1):
-            cur_label_str+=str(cur_label[label_i])+','
-        if len(cur_label)>0:
-            cur_label_str+=str(cur_label[len(cur_label)-1])
-        for ts in range(st_time,end_time):                        
-            target[ts+4-1]=cur_label_str+' '+target[ts+4-1]
-            print cur_label_str
+                break
 
-        if last_time is not 0:
-            for ts in range(last_time,st_time):
-                target[ts+4-1]='10'+target[ts+4-1]
-                print '10 '
+        # construct label str like '1,2'
+        for label_i in range(0,len(cur_label) - 1):
+            cur_label_str += str(cur_label[label_i]) + ','
+        if len(cur_label) > 0:
+            cur_label_str += str(cur_label[len(cur_label) - 1])
 
-        last_time=end_time+1
+        # handle the time period
+        for ts in range(st_time, end_time + 1):
+            target[ts] = cur_label_str + ' ' + target[ts]
 
-    line=labels[len(labels)-1]
-    labelfeature=re.split('\s+',line);
-    for ts in range(last_time,int(labelfeature[0])):
-        target[ts+4-1]='10 '+target[ts+4-1]
-        print '10 '
+        # handle the blank time
+        if last_time is not 0 and last_time < st_time:
+            for ts in range(last_time + 1, st_time):
+                target[ts] = '10 ' + target[ts]
+
+        last_time = end_time
+
+    # handle the last str
+    line = labels[len(labels) - 1]
+    labelfeature = re.split('\s+', line);
+    for ts in range(last_time + 1, num):
+        target[ts]='10 ' + target[ts]
+
     return
-        
 
+def check_feature_label(target, num):
+    if not len(target) == num:
+        return False
+
+    for i in range(0, num):
+        curcount = len(re.split('\s+', target[i]))
+        if curcount != 266:
+            print 'curidx' + str(i) + ': curcount:' + str(curcount)
+            return False
+    
+    return True
+ 
 interactionFile = open("feature_interaction") # the idx of feature is [0,8]
 faceFile = open("feature_face")  # the idx of feature is [9,264]
 labelFile = open("label")
 
-featureFile= file("feature_file","w+")
+featureFile= file("feature_file", "w+")
 feature = []
 
 data = []
@@ -94,20 +139,33 @@ handle_interaction(interactionLines, data)
 
 # get train set count
 num = len(data)
+canUse = [True] * num;
+
 
 # handle face
 faceLines = faceFile.readlines()
-handle_face(faceLines, data, num)
+handle_face(faceLines, data, num, canUse)
 
 # handle labels
 labels=labelFile.readlines()
-handle_label(labels,data,num)
+handle_label(labels, data, num)
+
+# check feature and label is correct
+if check_feature_label(data, num):
+    print '[CORRECT]'
+else:
+    print '[ERROR]'
 
 # convert to file
+writedata = []
 for i in range(0, num):
-    data[i] += '\n'
+    if canUse[i]:
+        writedata.append(data[i])
 
-featureFile.writelines(data)
+for i in range(0, len(writedata)):
+        writedata[i] += '\n'
+
+featureFile.writelines(writedata)
 featureFile.close()
 faceFile.close()
 interactionFile.close()
