@@ -6,10 +6,76 @@ using System.Threading.Tasks;
 
 namespace RealSense.RealSenseData
 {
+
     /// <summary>
     /// 面部标定数据
     /// </summary>
     public class FacialLandmarks
+    {
+        // RealSense提供
+       private static PXCMPoint3DF32[] landmarksData=new PXCMPoint3DF32[78];
+        //public Dictionary<PXCMFaceData.LandmarksGroupType, PXCMPoint3DF32[]> landmarksData { set; get; }
+        // 发生时间
+        public CustomTime happenTS { set; get; }
+
+        private string SEPERATOR = " ";
+
+        public FacialLandmarks()
+        {
+            //this.landmarksData = new Dictionary<PXCMFaceData.LandmarksGroupType, PXCMPoint3DF32[]>();
+        }
+
+        public void updateData(PXCMFaceData.Face face)
+        {
+            if (face == null) { return; }
+            PXCMFaceData.LandmarksData ldata = face.QueryLandmarks();
+            if (ldata == null) { return; }
+
+            PXCMRectI32 rect;
+            face.QueryDetection().QueryBoundingRect(out rect);
+
+            PXCMFaceData.LandmarkPoint[] points;
+            ldata.QueryPoints(out points);
+            if(points==null || points.Length == 0) { return; }
+
+            for(int i=0;i<78;i++)
+            {
+                landmarksData[i].x = points[i].image.x - rect.x;
+                landmarksData[i].y = points[i].image.y - rect.y;
+                landmarksData[i].z = points[i].world.z;
+            }
+        }
+        
+
+        public override string ToString()
+        {
+            string res = "";
+
+            foreach(var p in landmarksData)
+            {
+                res += p.x + SEPERATOR + p.y + SEPERATOR + p.z + SEPERATOR;
+            }
+            return res;
+        }
+
+        public static string generateBlank()
+        {
+            string res = "";
+
+            for (int i = 0; i < 33 * 3; i++)
+            {
+                res += "0" + " ";
+            }
+            return res;
+
+        }
+    }
+
+
+    /// <summary>
+    /// 面部标定数据
+    /// </summary>
+    public class FacialLandmarks2
     {
         // RealSense提供
         public Dictionary<PXCMFaceData.LandmarksGroupType, PXCMPoint3DF32[]> landmarksData { set; get; }
@@ -18,7 +84,7 @@ namespace RealSense.RealSenseData
 
         private string SEPERATOR = " ";
 
-        public FacialLandmarks()
+        public FacialLandmarks2()
         {
             this.landmarksData = new Dictionary<PXCMFaceData.LandmarksGroupType, PXCMPoint3DF32[]>();
         }

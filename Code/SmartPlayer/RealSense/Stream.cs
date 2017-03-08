@@ -238,6 +238,9 @@ namespace RealSense
             
             FacialLandmarks flm = new FacialLandmarks();
             flm.updateData(face);
+           // string s = flm.ToString();
+            //string[] ss = s.Split(' ');
+           // Console.WriteLine(ss.Length.ToString());
             return flm;
         }
 
