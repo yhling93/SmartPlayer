@@ -29,9 +29,13 @@ namespace RealSense.RealSenseData
             PXCMFaceData.LandmarksData ldata = face.QueryLandmarks();
             if (ldata == null) { return; }
 
+            PXCMRectI32 rect;
+            face.QueryDetection().QueryBoundingRect(out rect);
+
             // get the landmark data
             var landmarkGroupTypes = Enum.GetValues(typeof(PXCMFaceData.LandmarksGroupType)).Cast<PXCMFaceData.LandmarksGroupType>();
-            
+
+            int count = 0;
             // 对于每个LandmarkPoint转换成成员变量中的world属性
             foreach (var landmarkGroupType in landmarkGroupTypes)
             {
@@ -43,11 +47,15 @@ namespace RealSense.RealSenseData
                 for (int i = 0; i < points.Length; i++)
                 {
                     Point3DArray[i] = points[i].world;
+                    Console.WriteLine(String.Join(" ", rect.x, rect.y, rect.w, rect.h));
+                    Console.WriteLine(points[i].image.x + "\t"+points[i].image.y + "\t"+ points[i].world.z);
                 }
-                
+                count += points.Length;
                 // 将world坐标加进去
                 landmarksData.Add(landmarkGroupType, Point3DArray);
             }
+
+            Console.WriteLine(count);
         }
 
         public override string ToString()

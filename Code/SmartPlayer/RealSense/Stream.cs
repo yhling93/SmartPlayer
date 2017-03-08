@@ -396,6 +396,7 @@ namespace RealSense
 
                 // 原生算法调用处理，并缓存实时数据
                 faceData.Update();
+                FacialLandmarks fl = this.GetFaceLandmarks();
 
                 // 用于显示视频流功能
                 if (m_display) { this.DoRender(); }
