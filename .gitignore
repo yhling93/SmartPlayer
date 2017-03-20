@@ -5,3 +5,13 @@ Code/SmartPlayer/SmartPlayer.sln
 Code/SmartPlayer/SmartPlayer/libpxccpp2c.dll
 Code/SmartPlayer/SmartPlayer/libpxcclr.cs.dll
 Code/SmartPlayer/SmartPlayer/RealSense/TrackModule.cs~RF53a4625.TMP
+
+*.pdb
+*.exe
+*.Cache
+*.cache
+*.exe
+*.exe.config
+*.exe
+*.manifest
+*.obj
