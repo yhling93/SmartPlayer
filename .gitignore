@@ -15,3 +15,5 @@ Code/SmartPlayer/SmartPlayer/RealSense/TrackModule.cs~RF53a4625.TMP
 *.exe
 *.manifest
 *.obj
+
+.rssdk

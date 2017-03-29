@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using RealSense;
+using System.Diagnostics;
 
 namespace TestRealSense
 {
@@ -65,7 +66,9 @@ namespace TestRealSense
         
         private void button4_Click(object sender, EventArgs e)
         {
-            System.IO.DirectoryInfo folder = new System.IO.DirectoryInfo(@"H:\2017.2.18(1,2,3,5,6,9,11,13,15)");
+          
+           System.IO.DirectoryInfo folder = new System.IO.DirectoryInfo(@"H:\20170218");
+            //System.IO.DirectoryInfo folder = new System.IO.DirectoryInfo(@"H:\2017.3.19");
             // 1,2,3...
             System.IO.DirectoryInfo[] oneDir = folder.GetDirectories();
             // SmartPlayer_Data
@@ -85,10 +88,10 @@ namespace TestRealSense
                     threeDir = twoDir[j].GetDirectories();
                     for(int k=0;k<threeDir.Length;k++)
                     {
-                        dirList.Add(threeDir[k].FullName);
                         System.IO.FileInfo[] finfos= threeDir[k].GetFiles("*.rssdk");
                         foreach (System.IO.FileInfo fi in finfos)
                         {
+                            dirList.Add(threeDir[k].FullName);
                             fnameList.Add(fi.FullName);
                         }
                     }
@@ -104,16 +107,118 @@ namespace TestRealSense
                 Console.WriteLine(n);
             }
 
-            //string[] dirs = new string[] { dirList[0] };
-            //string[] fnames = new string[] { fnameList[0] };
-            //rs.GenerateFaceData(dirs, fnames);
-            rs.GenerateFaceData(dirList.ToArray(), fnameList.ToArray());
+            Console.WriteLine(fnameList.Count);
+            // int idex = 1;
+            //string[] dirs = new string[] { dirList[idex] };
+            //string[] fnames = new string[] { fnameList[idex] };
+            string dirname = @"H:\20170218\5\SmartPlayer Data\7bb6057f-4333-47ff-a68f-311666a9c663";
+            string[] dirs = new string[] { dirname };
+            string[] fnames = new string[] {dirname+"\\record.rssdk" };
+            rs.GenerateFaceData(dirs, fnames);
+
+            //dirList.RemoveAt(0);
+            //fnameList.RemoveAt(0);
+            //dirList.RemoveAt(1);
+            //fnameList.RemoveAt(1);
+
+           // rs.GenerateFaceData(dirList.ToArray(), fnameList.ToArray());
 
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
             rs.Pause();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            System.IO.DirectoryInfo folder = new System.IO.DirectoryInfo(@"H:\20170218");
+            //System.IO.DirectoryInfo folder = new System.IO.DirectoryInfo(@"H:\2017.3.19");
+            // 1,2,3...
+            System.IO.DirectoryInfo[] oneDir = folder.GetDirectories();
+            // SmartPlayer_Data
+            System.IO.DirectoryInfo[] twoDir;
+            //SessionID
+            System.IO.DirectoryInfo[] threeDir;
+
+            List<string> dirList = new List<string>();
+            List<string> fnameList = new List<string>();
+
+            for (int i = 0; i < oneDir.Length; i++)
+            {
+                twoDir = oneDir[i].GetDirectories();
+
+                for (int j = 0; j < twoDir.Length; j++)
+                {
+                    threeDir = twoDir[j].GetDirectories();
+                    for (int k = 0; k < threeDir.Length; k++)
+                    {
+                        System.IO.FileInfo[] finfos = threeDir[k].GetFiles("*.rssdk");
+                        foreach (System.IO.FileInfo fi in finfos)
+                        {
+                            dirList.Add(threeDir[k].FullName);
+                            fnameList.Add(fi.FullName);
+                        }
+                    }
+                }
+            }
+
+            foreach (string n in dirList)
+            {
+                Console.WriteLine(n);
+            }
+            foreach (string n in fnameList)
+            {
+                Console.WriteLine(n);
+            }
+
+            Console.WriteLine("fname count : "+fnameList.Count);
+            Console.WriteLine();
+            Console.WriteLine();
+
+#if false
+            string dirname = @"H:\2017.3.19\3\data\1aaa1907-8584-4aad-88bd-2a465d1cadf1";
+            string dirname2 = @"H:\20170218\5\SmartPlayer Data\7bb6057f-4333-47ff-a68f-311666a9c663";
+            string[] dirs = new string[] { dirname };
+            string[] fnames = new string[] { dirname + "\\record.rssdk" };
+#else
+            string[] dirs = dirList.ToArray();
+            string[] fnames = fnameList.ToArray();
+#endif
+
+            for (int i = 0; i < fnames.Length; i++)
+            {
+                Console.WriteLine("start handle " + fnames[i]);
+                Console.WriteLine("record No." + i + " start to handle");
+
+                string exepath=@"F:\GitPath\SmartPlayer\Code\SmartPlayer\ProcessHandle\bin\Debug\ProcessHandle.exe";
+                //string exepath = "cmd.exe";
+
+                Process myProcess = new Process();
+                try
+                {
+                    myProcess.StartInfo.UseShellExecute = false;
+                    myProcess.StartInfo.FileName = exepath;
+                    myProcess.StartInfo.Arguments = " "+dirs[i] + " "+fnames[i];
+                    myProcess.StartInfo.CreateNoWindow = false;
+                    //myProcess.StartInfo.RedirectStandardInput = true;  // 重定向输入流 
+                   // myProcess.StartInfo.RedirectStandardOutput = true;  //重定向输出流 
+                    //myProcess.StartInfo.RedirectStandardError = true;  //重定向错误流 
+
+
+                    myProcess.Start();
+
+                    
+                    myProcess.WaitForExit();
+                }
+                catch (Exception eee)
+                {
+                    Console.WriteLine(eee.Message);
+                }
+
+
+                Console.WriteLine("record No." + i + " is handled");
+            }
         }
     }
 }

@@ -1,0 +1,8 @@
+F:\GitPath\SmartPlayer\Code\SmartPlayer\FaceAlign\bin\Debug\FaceAlign.exe.config
+F:\GitPath\SmartPlayer\Code\SmartPlayer\FaceAlign\bin\Debug\FaceAlign.exe
+F:\GitPath\SmartPlayer\Code\SmartPlayer\FaceAlign\bin\Debug\FaceAlign.pdb
+F:\GitPath\SmartPlayer\Code\SmartPlayer\FaceAlign\obj\Debug\FaceAlign.Form1.resources
+F:\GitPath\SmartPlayer\Code\SmartPlayer\FaceAlign\obj\Debug\FaceAlign.Properties.Resources.resources
+F:\GitPath\SmartPlayer\Code\SmartPlayer\FaceAlign\obj\Debug\FaceAlign.csproj.GenerateResource.Cache
+F:\GitPath\SmartPlayer\Code\SmartPlayer\FaceAlign\obj\Debug\FaceAlign.exe
+F:\GitPath\SmartPlayer\Code\SmartPlayer\FaceAlign\obj\Debug\FaceAlign.pdb

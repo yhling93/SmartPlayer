@@ -38,6 +38,7 @@
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.lb_timestamp = new System.Windows.Forms.Label();
+            this.button6 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbMain)).BeginInit();
             this.SuspendLayout();
             // 
@@ -138,11 +139,22 @@
             this.lb_timestamp.TabIndex = 8;
             this.lb_timestamp.Text = "TimeStamp";
             // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(331, 455);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(275, 23);
+            this.button6.TabIndex = 9;
+            this.button6.Text = "DO NOT PRESS!!!(Process Handle Face Data)";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(862, 490);
+            this.Controls.Add(this.button6);
             this.Controls.Add(this.lb_timestamp);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);
@@ -173,6 +185,7 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Label lb_timestamp;
+        private System.Windows.Forms.Button button6;
     }
 }
 
