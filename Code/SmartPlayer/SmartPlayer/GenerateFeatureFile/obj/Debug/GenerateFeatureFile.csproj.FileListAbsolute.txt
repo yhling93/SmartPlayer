@@ -1,0 +1,11 @@
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartPlayer\GenerateFeatureFile\bin\Debug\GenerateFeatureFile.exe.config
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartPlayer\GenerateFeatureFile\bin\Debug\GenerateFeatureFile.exe
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartPlayer\GenerateFeatureFile\bin\Debug\GenerateFeatureFile.pdb
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartPlayer\GenerateFeatureFile\bin\Debug\MongoDB.Bson.dll
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartPlayer\GenerateFeatureFile\bin\Debug\MongoDB.Driver.Core.dll
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartPlayer\GenerateFeatureFile\bin\Debug\MongoDB.Driver.dll
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartPlayer\GenerateFeatureFile\bin\Debug\MongoDB.Bson.xml
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartPlayer\GenerateFeatureFile\bin\Debug\MongoDB.Driver.xml
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartPlayer\GenerateFeatureFile\bin\Debug\MongoDB.Driver.Core.xml
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartPlayer\GenerateFeatureFile\obj\Debug\GenerateFeatureFile.exe
+F:\GitPath\SmartPlayer\Code\SmartPlayer\SmartPlayer\GenerateFeatureFile\obj\Debug\GenerateFeatureFile.pdb

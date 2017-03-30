@@ -2,6 +2,10 @@ F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSense\bin\Debug\RealSense.dll
 F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSense\bin\Debug\RealSense.pdb
 F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSense\bin\Debug\libpxcclr.cs.dll
 F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSense\bin\Debug\libsampledx.dll
-F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSense\obj\Debug\RealSense.csprojResolveAssemblyReference.cache
 F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSense\obj\Debug\RealSense.dll
 F:\GitPath\SmartPlayer\Code\SmartPlayer\RealSense\obj\Debug\RealSense.pdb
+E:\SmartPlayer\Code\SmartPlayer\RealSense\bin\Debug\RealSense.dll
+E:\SmartPlayer\Code\SmartPlayer\RealSense\bin\Debug\RealSense.pdb
+E:\SmartPlayer\Code\SmartPlayer\RealSense\obj\Debug\RealSense.dll
+E:\SmartPlayer\Code\SmartPlayer\RealSense\obj\Debug\RealSense.pdb
+E:\SmartPlayer\Code\SmartPlayer\RealSense\obj\Debug\RealSense.csprojResolveAssemblyReference.cache

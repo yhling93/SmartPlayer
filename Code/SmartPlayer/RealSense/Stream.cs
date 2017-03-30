@@ -30,6 +30,7 @@ namespace RealSense
         private static D2D1Render render=new D2D1Render();
         private event EventHandler<RenderFrameEventArgs> RenderFrame = null;
         private long m_timestamp;
+        private long m_timestamp_last=-1;
         private long m_timestamp_sec;
         private long m_timestamp_sec_last=-1;
         private long m_timestamp_sec_init=-1;
@@ -107,6 +108,7 @@ namespace RealSense
             InitPowerState();
         }
 
+
         /// <summary>
         /// 本函数为Form添加FormClosingEvent,关闭窗口时关闭rs实例。构造函数依据Stream.***Option来使用
         /// </summary>
@@ -116,8 +118,10 @@ namespace RealSense
             m_algoOption = ao;
             m_streamOption = so;
             m_recordOption = ro;
+            if(f!=null)
+                f.FormClosing += new System.Windows.Forms.FormClosingEventHandler(FormClosingHandler);
 
-            f.FormClosing += new System.Windows.Forms.FormClosingEventHandler(FormClosingHandler);
+
 
             InitPowerState();
         }
@@ -133,6 +137,9 @@ namespace RealSense
             m_streamOption = so;
             m_recordOption = ro;
             
+            if(session==null)
+                 session= PXCMSession.CreateInstance();
+
             InitPowerState();
         }
 
@@ -230,7 +237,7 @@ namespace RealSense
             if (nFace == 0)
             {
 #if DEBUG
-                Console.WriteLine("No face in current frame");
+                //Console.WriteLine("No face in current frame");
 #endif
                 return null;
             }
@@ -238,6 +245,9 @@ namespace RealSense
             
             FacialLandmarks flm = new FacialLandmarks();
             flm.updateData(face);
+           // string s = flm.ToString();
+            //string[] ss = s.Split(' ');
+           // Console.WriteLine(ss.Length.ToString());
             return flm;
         }
 
@@ -251,7 +261,7 @@ namespace RealSense
             if (nFace == 0)
             {
 #if DEBUG
-                Console.WriteLine("No face in current frame");
+                //Console.WriteLine("No face in current frame");
 #endif
                 return null;
             }
@@ -263,14 +273,14 @@ namespace RealSense
             if (edata == null)
             {
 #if DEBUG
-                Console.WriteLine("no expression this frame");
+                //Console.WriteLine("no expression this frame");
 #endif
                 return null;
             }
 #if DEBUG
             else
             {
-                Console.WriteLine("catch expression");
+                //Console.WriteLine("catch expression");
             }
 #endif
             for (int i = 0; i < 22; i++)
@@ -292,26 +302,59 @@ namespace RealSense
         //    return true;
         //}
 
+        public void GenerateFaceData_By_One(string dir, string fname)
+        {
+
+            Console.WriteLine("start handle " + fname);
+            this.PlaybackFile = fname;
+            buffer = "";
+            DoStreaming_SaveData();
+            this.WriteFile(buffer, dir + "\\Facedata.md");
+            buffer = "";
+            Console.WriteLine("record " + fname + " is handled");
+
+        }
+
         public void GenerateFaceData(string[] dirs,string [] fnames)
         {
+
             for (int i = 0; i < fnames.Length; i++)
             {
-                this.PlaybackDir = dirs[i];
+                Console.WriteLine("start handle " + fnames[i]);
+                Console.WriteLine("record No." + i + " start to handle");
                 this.PlaybackFile = fnames[i];
-
-                //DoStreaming_SaveData();
                 DoStreaming_SaveData();
-                //System.Threading.Thread thread = new System.Threading.Thread(DoStreaming_SaveData);
-                //thread.Start();
-                //System.Threading.Thread.Sleep(5);
-
-                //thread.Join();
-
-                //Write File
-                this.WriteFile(buffer, this.PlaybackDir + "\\Facedata.md");
+                this.WriteFile(buffer, dirs[i] + "\\Facedata.md");
                 buffer = "";
-
+                Console.WriteLine("record No." + i + " is handled");
             }
+
+            //DoStreaming_SaveData_Open();
+
+            //DoStreaming_SaveData_Do(@"F:\record_handy\record.rssdk");
+            //this.WriteFile(buffer, @"F:\record_handy\Facedata.md");
+            //for (int i = 0; i < fnames.Length; i++)
+            //{
+            //    this.PlaybackDir = dirs[i];
+            //    this.PlaybackFile = fnames[i];
+            //    DoStreaming_SaveData_Do(this.PlaybackFile);
+            //    this.WriteFile(buffer, this.PlaybackDir + "\\Facedata.md");
+            //    buffer = "";
+            //}
+
+            //DoStreaming_SaveData_Close();
+
+
+
+            //for (int i = 0; i < fnames.Length; i++)
+            //{
+            //    this.PlaybackDir = dirs[i];
+            //    this.PlaybackFile = fnames[i];
+            //    DoStreaming_SaveData();
+            //    this.WriteFile(buffer, this.PlaybackDir + "\\Facedata.md");
+            //    buffer = "";
+            //    this.Stop();
+            //}
         }
         
         public void PlayByFrameIndex(string filename)
@@ -396,6 +439,7 @@ namespace RealSense
 
                 // 原生算法调用处理，并缓存实时数据
                 faceData.Update();
+                FacialLandmarks fl = this.GetFaceLandmarks();
 
                 // 用于显示视频流功能
                 if (m_display) { this.DoRender(); }
@@ -407,14 +451,186 @@ namespace RealSense
         }
 
         // 循环执行流的主体程序
+        private void DoStreaming_SaveData_Open()
+        {
+            this.m_stopped = false;
+            InitStreamState();
+            switch (m_algoOption)
+            {
+                // 面部算法
+                case AlgoOption.Face:
+                    this.faceModule = manager.QueryFace();
+                    if (faceModule == null) { MessageBox.Show("QueryFace failed"); return; }
+
+                    InitFaceState();
+
+                    this.faceData = this.faceModule.CreateOutput();
+                    if (faceData == null) { MessageBox.Show("CreateOutput failed"); return; }
+
+                    break;
+            }
+
+            if (manager.Init() < pxcmStatus.PXCM_STATUS_NO_ERROR)
+            {
+#if DEBUG
+                System.Windows.Forms.MessageBox.Show("init failed");
+#endif
+                return;
+            }
+        }
+
+        private long lastTrueStamp = -1;
+        private long currentTrueStamp = -1;
+
+        private int lastIndex = -1;
+        private int currentIndex = -1;
+        private void DoStreaming_SaveData_Do(string file)
+        {
+            manager.captureManager.SetRealtime(false);
+            manager.captureManager.SetFileName(file, true);
+            //manager.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_COLOR, 640, 480, 30);
+
+            //manager.EnableStream(PXCMCapture.StreamType.STREAM_TYPE_DEPTH, 320, 240, 30);
+
+            Console.WriteLine("handling file:\t" + file);
+
+            Console.WriteLine(manager.captureManager.QueryNumberOfFrames().ToString());
+
+            FacialLandmarks fl;
+            FacialExpression fe;
+
+
+            while (!m_stopped)
+            {
+                if (manager.AcquireFrame(true).IsError()) { break; }
+                //Console.WriteLine(sps.ToString()+"\t"+ manager.captureManager.QueryFrameIndex().ToString());
+
+                this.sample = manager.QuerySample();
+                //if (sample == null) { manager.ReleaseFrame(); continue; }
+
+                
+
+                /******************************************************
+                 * 
+                 * 1.获取当前Frame
+                 * 2.判断当前Frame是否有深度或者颜色信息
+                 *     2.1 如果两者都有，判断时间是否为下一秒
+                 *         2.1.1 如果是下一秒，处理当前Frame
+                 *         2.1.2 如果不是，结束本次循环
+                 *     2.2 如果没有，则结束本次循环
+                 * ****************************************************/
+
+
+                if (sample.color != null)
+                    this.m_timestamp = sample.color.timeStamp;
+                else
+                    continue;
+                //if (sample.depth != null)
+                //    this.m_timestamp = (sample.depth.timeStamp);
+                //else if (sample.color != null)
+                //    this.m_timestamp = sample.color.timeStamp;
+                //else
+                //    continue;
+
+                Console.WriteLine(m_timestamp.ToString());
+
+                if(sample.depth!=null || sample.color!=null)
+                {
+                    //if (m_timestamp == m_timestamp_last)
+                    //{
+                    //    break;
+                    //}
+                    m_timestamp_last = m_timestamp;
+                }
+
+                // 仅当下一秒时调用检测算法
+                m_timestamp_sec = m_timestamp / 10000000;
+                Console.WriteLine("Curframe time :" + m_timestamp_sec);
+
+                if (m_timestamp_sec_init == -1) { m_timestamp_sec_init = m_timestamp_sec; }
+                if (m_timestamp_sec_last == -1)
+                {
+                    m_timestamp_sec_last = m_timestamp_sec - 1;
+                }
+                long interval = m_timestamp_sec - m_timestamp_sec_last;
+                //if(interval==0)
+                //{
+                //    break;
+                //}
+                if (interval > 0)
+                {
+                    if (interval > 1)
+                    {
+                        for (int i = 1; i < interval; i++)
+                        {
+                            buffer += (m_timestamp_sec_last + i - m_timestamp_sec_init).ToString() + " ";
+                            buffer += "\n";
+                            Console.WriteLine((m_timestamp_sec_last + i - m_timestamp_sec_init).ToString());
+                        }
+                    }
+
+                    buffer += (m_timestamp_sec - m_timestamp_sec_init).ToString() + " ";
+
+                    // 原生算法调用处理，并缓存实时数据
+                    faceData.Update();
+
+                    fl = this.GetFaceLandmarks();
+                    fe = this.GetExpression();
+
+                    if (fl != null)
+                        buffer += fl.ToString();
+                    else
+                        buffer += FacialLandmarks.generateBlank();
+                    if (fe != null)
+                        buffer += fe.ToString();
+                    else
+                        buffer += FacialExpression.generateBlank();
+
+                    buffer += "\n";
+                    m_timestamp_sec_last = m_timestamp_sec;
+
+                    
+                    //Console.WriteLine((m_timestamp_sec- m_timestamp_sec_init).ToString());
+                }
+
+                //if(m_timestamp_sec>m_timestamp_sec_last)
+                //{
+                //    // 原生算法调用处理，并缓存实时数据
+                //    faceData.Update();
+
+                //    fl = this.GetFaceLandmarks();
+                //    fe = this.GetExpression();
+                //    if (fl != null)
+                //        buffer += fl.ToString();
+                //    if (fe != null)
+                //        buffer += fe.ToString();
+                //    buffer += "\n";
+                //    m_timestamp_sec_last = m_timestamp_sec;
+                //    Console.WriteLine(m_timestamp_sec.ToString());
+                //}
+
+                // 用于显示视频流功能
+                if (m_display) { this.DoRender(); }
+
+                manager.ReleaseFrame();
+            }
+        }
+        private void DoStreaming_SaveData_Close()
+        {
+            faceData.Dispose();
+            manager.Dispose();
+        }
+
         private void DoStreaming_SaveData()
         {
             this.m_stopped = false;
             InitStreamState();
 
             // 设置Playback模式
-            //manager.captureManager.SetFileName(this.PlaybackFile, false);
+            manager.captureManager.SetFileName(this.PlaybackFile, false);
+            manager.captureManager.SetRealtime(false);
 
+            int nOf=manager.captureManager.QueryNumberOfFrames();
 
             switch (m_algoOption)
             {
@@ -448,9 +664,7 @@ namespace RealSense
 
                 this.sample = manager.QuerySample();
                 //if (sample == null) { manager.ReleaseFrame(); continue; }
-
-
-
+                
 
                 if (sample.depth != null)
                     this.m_timestamp = (sample.depth.timeStamp);
@@ -462,6 +676,13 @@ namespace RealSense
 
                 // 仅当下一秒时调用检测算法
                 m_timestamp_sec = m_timestamp / 10000000;
+
+                if(m_timestamp_sec_init!=-1 && m_timestamp_sec - m_timestamp_sec_init>=nOf)
+                {
+                    break;
+                }
+
+                Console.WriteLine("curframe:" + m_timestamp_sec);
 
                 if (m_timestamp_sec_init == -1) { m_timestamp_sec_init = m_timestamp_sec; }
                 if (m_timestamp_sec_last==-1)
@@ -500,7 +721,7 @@ namespace RealSense
 
                     buffer += "\n";
                     m_timestamp_sec_last = m_timestamp_sec;
-                    Console.WriteLine((m_timestamp_sec- m_timestamp_sec_init).ToString());
+                    //Console.WriteLine((m_timestamp_sec- m_timestamp_sec_init).ToString());
                 }
 
                 //if(m_timestamp_sec>m_timestamp_sec_last)
@@ -527,6 +748,7 @@ namespace RealSense
             faceData.Dispose();
             manager.Dispose();
 
+            Console.WriteLine("done!!!");
         }
 
         private void PlaybackStreaming_PlayByFrameIndex()
@@ -608,6 +830,22 @@ namespace RealSense
 
         private void WriteFile(string str, string path)
         {
+            if (System.IO.File.Exists(path))
+            {
+                // Use a try block to catch IOExceptions, to
+                // handle the case of the file already being
+                // opened by another process.
+                try
+                {
+                    System.IO.File.Delete(path);
+                }
+                catch (System.IO.IOException e)
+                {
+                    Console.WriteLine(e.Message);
+                    return;
+                }
+            }
+
             System.IO.FileStream fs = new System.IO.FileStream(path, System.IO.FileMode.Create);
             System.IO.StreamWriter sw = new System.IO.StreamWriter(fs);
             //开始写入

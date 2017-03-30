@@ -50,10 +50,20 @@ namespace RealSensePlayer
         {
             rs.ReversePlay();
         }
+        
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private void button5_Click(object sender, EventArgs e)
         {
-            rs.updateFrameSpeed(Convert.ToInt32(this.textBox1.Text));
+            try
+            {
+                rs.updateFrameSpeed(Convert.ToInt32(this.textBox1.Text));
+            }
+            catch(Exception eee)
+            {
+                MessageBox.Show(eee.Message);
+            }
         }
+
+
     }
 }
