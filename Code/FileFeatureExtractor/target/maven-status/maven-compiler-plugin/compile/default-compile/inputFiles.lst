@@ -1,3 +1,7 @@
-/home/adam/SmartPlayer/FileFeatureExtractor/src/main/java/com/adam/InteractionFeature.java
-/home/adam/SmartPlayer/FileFeatureExtractor/src/main/java/com/adam/Session.java
-/home/adam/SmartPlayer/FileFeatureExtractor/src/main/java/com/adam/Main.java
+/home/adam/SmartPlayer/Code/FileFeatureExtractor/src/main/java/com/adam/FeatureExtractor.java
+/home/adam/SmartPlayer/Code/FileFeatureExtractor/src/main/java/com/adam/Data/CustomTime.java
+/home/adam/SmartPlayer/Code/FileFeatureExtractor/src/main/java/com/adam/Data/PeriodEvent.java
+/home/adam/SmartPlayer/Code/FileFeatureExtractor/src/main/java/com/adam/Data/MomentEvent.java
+/home/adam/SmartPlayer/Code/FileFeatureExtractor/src/main/java/com/adam/Data/Session.java
+/home/adam/SmartPlayer/Code/FileFeatureExtractor/src/main/java/com/adam/Main.java
+/home/adam/SmartPlayer/Code/FileFeatureExtractor/src/main/java/com/adam/InteractionFeature.java

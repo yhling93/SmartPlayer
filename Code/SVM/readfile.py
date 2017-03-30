@@ -1,5 +1,6 @@
 import re
-
+import sys
+import random
 def handle_interaction(interactionLines, target):
     for line in interactionLines:
         curfeature = line.split( )
@@ -16,8 +17,6 @@ def handle_face(faceLines, target, count, canUse):
     for i in range(0, count):
         line = faceLines[i]
         curfeature=re.split('\s+', line)
-        #curfeature = line.split(' ')
-        #print(str(i) + ' ' + str(len(curfeature)) + '\n')
         # total 121 feature
         if len(curfeature) < 258:
             # if feature doesn't meet requirement, set the can use flag to be false
@@ -50,9 +49,13 @@ def check_face_feature(curfeature):
     rate = 1.0 * zeroCount / count
     return rate < 0.5
 
-labelmap={'amused':1,'tired':2,'despise':3,'thinking':4,'notetaking':5,'confused':6,'surprised':7,'distracted':8,'normal':9,'unknown':10,'concentrated':11}
+labelmap={'amused':1,'tired':2,'despise':3,
+        'thinking':4,'notetaking':5,'confused':6,
+        'surprised':7,'distracted':8,'normal':9,
+        'unknown':10,'concentrated':11, 'bored':12}
+
 def handle_label(labels, target, count):
-   
+    print "in handling_label fun, count is",count 
     last_time=0
     line = labels[0]
     labelfeature= re.split('\s+',line)
@@ -94,12 +97,16 @@ def handle_label(labels, target, count):
 
         # handle the time period
         for ts in range(st_time, end_time + 1):
+            if ts >= count:
+                break;
             target[ts] = cur_label_str + ' ' + target[ts]
 
         # handle the blank time
         if last_time is not 0 and last_time < st_time:
             for ts in range(last_time + 1, st_time):
-                target[ts] = '10 ' + target[ts]
+                if ts >= count:
+                    break;
+                target[ts] = '9 ' + target[ts]
 
         last_time = end_time
 
@@ -112,6 +119,7 @@ def handle_label(labels, target, count):
     return
 
 def check_feature_label(target, num):
+    flag = True
     if not len(target) == num:
         return False
 
@@ -119,15 +127,18 @@ def check_feature_label(target, num):
         curcount = len(re.split('\s+', target[i]))
         if curcount != 266:
             print 'curidx' + str(i) + ': curcount:' + str(curcount)
-            return False
+            print '\n' + target[i]
+            flag = False
     
-    return True
- 
-interactionFile = open("feature_interaction") # the idx of feature is [0,8]
-faceFile = open("feature_face")  # the idx of feature is [9,264]
-labelFile = open("label")
+    return flag
 
-featureFile= file("feature_file", "w+")
+
+workDir = sys.argv[1] #get work dir
+interactionFile = open(workDir + "/feature_interaction") # the idx of feature is [0,8]
+faceFile = open(workDir + "/Facedata.md")  # the idx of feature is [9,264]
+labelFile = open(workDir + "/label.txt")
+
+featureFile= file(workDir + "/feature_file", "w+")
 feature = []
 
 data = []
@@ -139,7 +150,7 @@ handle_interaction(interactionLines, data)
 
 # get train set count
 num = len(data)
-canUse = [True] * num;
+canUse = [True] * num; # if there is face data, so the item can be used
 
 
 # handle face
@@ -164,6 +175,8 @@ for i in range(0, num):
 
 for i in range(0, len(writedata)):
         writedata[i] += '\n'
+
+random.shuffle(writedata)
 
 featureFile.writelines(writedata)
 featureFile.close()

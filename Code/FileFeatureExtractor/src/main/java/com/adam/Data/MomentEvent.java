@@ -8,4 +8,8 @@ public class MomentEvent {
     public CustomTime HappenTS;
     public int Type;
     public float PlayRate;
+
+    public MomentEvent() {
+        this.HappenTS = new CustomTime();
+    }
 }

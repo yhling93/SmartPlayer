@@ -13,7 +13,7 @@ import java.util.*;
  */
 public class FeatureExtractor {
 
-    private Session session;
+    public Session session;
 
     private FileReader sessionFr = null;
     private BufferedReader sessionBr = null;
@@ -63,8 +63,12 @@ public class FeatureExtractor {
             e.printStackTrace();
         } finally {
             try {
-                sessionBr.close();
-                sessionFr.close();
+                if(sessionBr != null) {
+                    sessionBr.close();
+                }
+                if(sessionFr != null) {
+                    sessionFr.close();
+                }
                 sessionBr = null;
                 sessionFr = null;
             } catch (IOException e) {
@@ -126,8 +130,21 @@ public class FeatureExtractor {
                     handlePeriodEvent(curPeriodEvent, features[idx + i]);
                 }
             }
-        } catch (Exception e) {
-
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (periodBr != null) {
+                    periodBr.close();
+                }
+                if (periodFr != null) {
+                    periodFr.close();
+                }
+                periodBr = null;
+                periodFr = null;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -153,12 +170,13 @@ public class FeatureExtractor {
 
             for(int i = 0; i < totalDuration; i++) {
                 // 如果下一个事件发生时刻未到，则保持上一秒状态
+
                 if(i != relativeHappenTS && i != 0) {
-                    features[i] = InteractionFeature.createFeature(features[i-1]);
+                    features[i] = InteractionFeature.createFeature(features[i - 1]);
                 }
 
                 // 如果下一个事件发生时刻到了，则读取所有这一秒发生的事件并处理
-                while(i == relativeHappenTS) {
+                while(i == relativeHappenTS && nextMomentEvent != null) {
                     // 如果此刻feature为空，先从上一秒复制一个feature（深拷贝）
                     if(features[i] == null) {
                         features[i] = InteractionFeature.createFeature(features[i-1]);
@@ -168,11 +186,34 @@ public class FeatureExtractor {
                     // 读取下一个事件
                     nextMomentStr = momentBr.readLine();
                     nextMomentEvent = gson.fromJson(nextMomentStr, MomentEvent.class);
-                    relativeHappenTS = (int) (nextMomentEvent.HappenTS.absTS - session.StartTime);
+                    if(nextMomentStr != null && nextMomentEvent != null) {
+                        relativeHappenTS = (int) (nextMomentEvent.HappenTS.absTS - session.StartTime);
+                    } else {
+                        // 这里的处理是因为有些moment file缺乏stop事件
+                        // 下一个事件为空，则将下一个事件时间设置为结束时间（即停止）
+                        nextMomentEvent = new MomentEvent();
+                        nextMomentEvent.HappenTS.absTS = session.EndTime;
+                        nextMomentEvent.Type = 12;
+                        relativeHappenTS = (int) (nextMomentEvent.HappenTS.absTS - session.StartTime);
+                    }
+
                 }
             }
-        } catch (Exception e) {
-
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (momentBr != null) {
+                    momentBr.close();
+                }
+                if (momentFr != null) {
+                    momentFr.close();
+                }
+                momentBr = null;
+                momentFr = null;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -183,22 +224,22 @@ public class FeatureExtractor {
         try {
             fileOutputStream = new FileOutputStream(featureFile);
             bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+            String sessionInfo = "SessionID:\t" + session.SessionID + "\tStartTime:\t" + session.StartTime + "\tEndTime:\t" + session.EndTime + "\n";
+            String firstLine = "play\t pause\t fastForward\t rewind\t forwardSkip\t reverseSkip\t fullScreen\t playTime\t rate\n";
+            bufferedOutputStream.write(sessionInfo.getBytes());
+            bufferedOutputStream.write(firstLine.getBytes());
+            bufferedOutputStream.flush();
             StringBuilder sb;
             for(int i = 0; i < features.length; i++) {
-                if(features[i] == null) {
-                    int now = (int) (session.StartTime + i);
-                    System.out.println(i + " " + gson.toJson(features[i-1]));
-                    return;
-                }
                 sb = new StringBuilder();
-                sb.append(features[i].play + " ");
-                sb.append(features[i].pause + " ");
-                sb.append(features[i].fastForward + " ");
-                sb.append(features[i].rewind + " ");
-                sb.append(features[i].forwardSkip + " ");
-                sb.append(features[i].reverseSkip + " ");
-                sb.append(features[i].fullScreen + " ");
-                sb.append(features[i].playTime + " ");
+                sb.append(features[i].play + "\t");
+                sb.append(features[i].pause + "\t");
+                sb.append(features[i].fastForward + "\t");
+                sb.append(features[i].rewind + "\t");
+                sb.append(features[i].forwardSkip + "\t");
+                sb.append(features[i].reverseSkip + "\t");
+                sb.append(features[i].fullScreen + "\t");
+                sb.append(features[i].playTime + "\t");
                 sb.append(features[i].rate + "\n");
                 bufferedOutputStream.write(sb.toString().getBytes());
                 bufferedOutputStream.flush();
@@ -206,9 +247,6 @@ public class FeatureExtractor {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NullPointerException e) {
-            System.out.println(session.SessionID);
             e.printStackTrace();
         } finally {
             try {
@@ -221,15 +259,12 @@ public class FeatureExtractor {
                     fileOutputStream.flush();
                     fileOutputStream.close();
                 }
+                bufferedOutputStream = null;
+                fileOutputStream = null;
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
-//        for(int i = 0; i < features.length; i++) {
-//            int now = (int) (i + session.StartTime);
-//            System.out.println(now + gson.toJson(features[i]));
-//        }
     }
 
     private void handleMomentEvent(MomentEvent event, InteractionFeature pfeature) {
