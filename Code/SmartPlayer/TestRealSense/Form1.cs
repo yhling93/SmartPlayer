@@ -186,12 +186,18 @@ namespace TestRealSense
             string[] fnames = fnameList.ToArray();
 #endif
 
+
+            dirs = new String[] { @"H:\20170218\2\SmartPlayer_Data\7e04cb4a-7d4a-46dc-82e7-594dcafe9614",
+            @"H:\20170218\2\SmartPlayer_Data\bb911879-3f10-49d2-b7ac-b04562fa51d2"};
+            fnames = new String[] { @"H:\20170218\2\SmartPlayer_Data\7e04cb4a-7d4a-46dc-82e7-594dcafe9614\record.rssdk",
+            @"H:\20170218\2\SmartPlayer_Data\bb911879-3f10-49d2-b7ac-b04562fa51d2\record.rssdk"};
+
             for (int i = 0; i < fnames.Length; i++)
             {
                 Console.WriteLine("start handle " + fnames[i]);
                 Console.WriteLine("record No." + i + " start to handle");
 
-                string exepath=@"F:\GitPath\SmartPlayer\Code\SmartPlayer\ProcessHandle\bin\Debug\ProcessHandle.exe";
+                string exepath=@"E:\SmartPlayer\Code\SmartPlayer\ProcessHandle\bin\Debug\ProcessHandle.exe";
                 //string exepath = "cmd.exe";
 
                 Process myProcess = new Process();
