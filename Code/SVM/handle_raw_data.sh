@@ -1,12 +1,14 @@
 #!/bin/bash
-dataDir=/home/adam/Experiment_Data/$1/Interaction_Data
+dataDir1=/home/adam/Experiment_Data/20170218/Interaction_Data
+dataDir2=/home/adam/Experiment_Data/20170319/Interaction_Data
 
-#workDir=$dataDir/$2
-#python readfile.py $workDir
-
-for dir in `ls $dataDir`
+for dir in `ls $dataDir1`
 do
-    workDir=$dataDir/$dir
-    echo 'handling dir:'$workDir
+    workDir=$dataDir1/$dir
+    python readfile.py $workDir
+done
+for dir in `ls $dataDir2`
+do
+    workDir=$dataDir2/$dir
     python readfile.py $workDir
 done

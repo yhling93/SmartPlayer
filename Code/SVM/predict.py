@@ -10,13 +10,16 @@ testCnt = 10
 
 labelArray = ['amused', 'tired', 'despise', 'thinking', 'notetaking', 'confused', 'surprised', 'distracted', 'normal', 'unknown', 'concentrated', 'bored']
 
-m = svm_load_model('./models/2.model')
+#m = svm_load_model('./models/2.model')
 
-for i in range(testCnt):
+m = svm_load_model('./models/ration0.8.model')
+for i in range(1):
     print '--------------------------------------------------------'
-    print 'Start predicting Test Set No.', str(i)
-    testset = "./datas/testset" + str(i)
+    #print 'Start predicting Test Set No.', str(2)
+    #testset = "./datas/testset" + str(2)
 
+    print 'Start predicting Test Set No. ration0.8'
+    testset = "./datas/testset_with_ration0.8"
     yt, xt = svm_read_problem(testset)
     # test set count map
     stdDict = {}
@@ -38,6 +41,8 @@ for i in range(testCnt):
             exactDict[p_label[j]] = exactDict.get(p_label[j], 0) + 1
         
     totalCnt = 0
+    predictTotalCnt = sum(preDict)
+
     for key in stdDict.keys():
         print '########## Label: ', key, ' ##########'
         accuracy = 0.0
@@ -53,7 +58,7 @@ for i in range(testCnt):
             f1measure = 0
         print 'key: ', key, 'keyLabel: ', labelArray[int(key)], ' accuracy: ', accuracy, ' recall: ', recall, ' f1 value: ',f1measure 
         print 'standard cnt: ', stdDict.get(key, 0), 'predict cnt: ', preDict.get(key, 0), 'exact cnt: ', exactDict.get(key, 0)
-        print 'accuracy: ', evl_acc, ' mean squared error: ', evl_mse, ' squared correlation coefficient: ', evl_scc
-        print 'Total Accuracy: ', 1.0 * totalCnt / len(yt)
         print '########## Label: ', key, ' ##########'
+    print 'accuracy: ', evl_acc, ' mean squared error: ', evl_mse, ' squared correlation coefficient: ', evl_scc
+    print 'Total Accuracy: ', 1.0 * totalCnt / len(yt)
     print '-----------------------------------------------------------'

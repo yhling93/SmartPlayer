@@ -10,8 +10,10 @@ fold = 1
 labelArray = ['amused', 'tired', 'despise', 'thinking', 'notetaking', 'confused', 'surprised', 'distracted', 'normal', 'unknown', 'concentrated', 'bored']
 
 for i in range(fold):
-    trainset = "./datas/trainset" + str(2)
-    testset = "./datas/testset" + str(2)
+    #trainset = "./datas/trainset2"
+    #testset = "./datas/testset2"
+    trainset = "./datas/trainset_with_ration0.8"
+    testset = "./datas/testset_with_ration0.8"
 
     y, x = svm_read_problem(trainset)
     yt, xt = svm_read_problem(testset)
@@ -31,8 +33,11 @@ for i in range(fold):
     acc_list = []
     label_list = []
     for d  in range (3, 4):
+        #this is for 9:1 trainset2 and testset2
+        #m = svm_train(y, x, '-t 1 -h 0 -c 32768 -d ' + str(d) + ' -g ' + str(0.03125))
+        #this is for 4:1 trainset_with_fold5_0 and testset_with_fold5_0
         m = svm_train(y, x, '-t 1 -h 0 -c 32768 -d ' + str(d) + ' -g ' + str(0.03125))
-        svm_save_model('./models/2.model', m)
+        svm_save_model('./models/ration0.8.model', m)
         p_label, p_acc, p_val = svm_predict(yt, xt, m)
         
         for j in range(len(yt)):
@@ -49,7 +54,7 @@ for i in range(fold):
                 accuracy = 1.0 * exactDict.get(key, 0) / stdDict.get(key)
             if preDict.get(key, 0) != 0:
                 recall = 1.0 * exactDict.get(key, 0) / preDict.get(key)
-            print 'key: ', key, 'keyLabel: ', labelArray[int(key)], ' accuracy: ', accuracy, ' recall: ', recall, 'standard cnt: ', stdDict.get(key, 0), 'predict cnt: ', preDict.get(key, 0), 'exact cnt: ', exactDict.get(key, 0)
+            print 'key: ', key, 'keyLabel: ', labelArray[int(key)-1], ' accuracy: ', accuracy, ' recall: ', recall, 'standard cnt: ', stdDict.get(key, 0), 'predict cnt: ', preDict.get(key, 0), 'exact cnt: ', exactDict.get(key, 0)
         #acc_list.append(p_acc)
         print 'Total Accuracy: ', 1.0 * totalCnt / len(yt)
         print '--------------------------------------------------'
