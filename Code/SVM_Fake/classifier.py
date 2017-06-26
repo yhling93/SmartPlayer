@@ -36,7 +36,7 @@ for i in range(fold):
         #this is for 9:1 trainset2 and testset2
         #m = svm_train(y, x, '-t 1 -h 0 -c 32768 -d ' + str(d) + ' -g ' + str(0.03125))
         #this is for 4:1 trainset_with_fold5_0 and testset_with_fold5_0
-        m = svm_train(y, x, '-b 1 -t 1 -h 0 -c 32768 -d ' + str(d) + ' -g ' + str(0.03125))
+        m = svm_train(y, x, '-t 1 -h 0 -c 32768 -d ' + str(d) + ' -g ' + str(0.03125))
         svm_save_model('./models/ration0.8.model', m)
         p_label, p_acc, p_val = svm_predict(yt, xt, m)
         

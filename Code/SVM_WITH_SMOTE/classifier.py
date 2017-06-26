@@ -9,11 +9,14 @@ fold = 1
 
 labelArray = ['amused', 'tired', 'despise', 'thinking', 'notetaking', 'confused', 'surprised', 'distracted', 'normal', 'unknown', 'concentrated', 'bored']
 
+#labelArray = ['amused', 'thinking', 'notetaking', 'confused', 'surprised', 'distracted', 'normal', 'unknown', 'concentrated'] 
 for i in range(fold):
     #trainset = "./datas/trainset2"
     #testset = "./datas/testset2"
-    trainset = "./datas/trainset_with_ration0.8"
-    testset = "./datas/testset_with_ration0.8"
+    trainset = './raw_datas/data_after_boardline_smote.scale.train_0.8'
+    testset = './raw_datas/data_after_boardline_smote.scale.test_0.8'
+    #trainset = './raw_datas/data_after_boardline_smote_and_pca_with_49.scale.train_0.8'
+    #testset = './raw_datas/data_after_boardline_smote_and_pca_with_49.scale.test_0.8'
 
     y, x = svm_read_problem(trainset)
     yt, xt = svm_read_problem(testset)
@@ -36,8 +39,10 @@ for i in range(fold):
         #this is for 9:1 trainset2 and testset2
         #m = svm_train(y, x, '-t 1 -h 0 -c 32768 -d ' + str(d) + ' -g ' + str(0.03125))
         #this is for 4:1 trainset_with_fold5_0 and testset_with_fold5_0
-        m = svm_train(y, x, '-b 1 -t 1 -h 0 -c 32768 -d ' + str(d) + ' -g ' + str(0.03125))
-        svm_save_model('./models/ration0.8.model', m)
+        m = svm_train(y, x, '-b 1 -t 1 -h 0 -c 512 -d ' + str(d) + ' -g ' + str(0.5))
+        #svm_save_model('./models/fournine_ration0.8.model', m)
+        svm_save_model('./models/data_after_boardline_smote.scale.model', m)
+        #svm_save_model('./models/data_after_boardline_smote_and_pca_with_49.scale.model', m)
         p_label, p_acc, p_val = svm_predict(yt, xt, m)
         
         for j in range(len(yt)):
