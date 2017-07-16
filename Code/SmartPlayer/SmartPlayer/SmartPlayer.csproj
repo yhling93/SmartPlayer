@@ -93,6 +93,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\CustomTime.cs" />
+    <Compile Include="Data\EntityData\Assistance.cs" />
+    <Compile Include="Data\EntityData\BookAssistance.cs" />
+    <Compile Include="Data\EntityData\Course.cs" />
+    <Compile Include="Data\EntityData\CourseAssistance.cs" />
+    <Compile Include="Data\EntityData\CourseChapter.cs" />
+    <Compile Include="Data\EntityData\CourseProgress.cs" />
+    <Compile Include="Data\EntityData\Emotion.cs" />
+    <Compile Include="Data\EntityData\Student.cs" />
+    <Compile Include="Data\EntityData\StudentEmotion.cs" />
+    <Compile Include="Data\EntityData\TextAssistance.cs" />
+    <Compile Include="Data\EntityData\VideoAssistance.cs" />
     <Compile Include="Data\InteractionData\EventFactory.cs" />
     <Compile Include="Data\InteractionData\PeriodData\FastForwardEvent.cs" />
     <Compile Include="Data\InteractionData\MomentData\FullScreenEnterEvent.cs" />
@@ -114,8 +125,11 @@
     <Compile Include="Data\RealSenseData\HandData.cs" />
     <Compile Include="Data\RealSenseData\HeadData.cs" />
     <Compile Include="Data\LearningSession.cs" />
+    <Compile Include="Data\EntityData\Video.cs" />
     <Compile Include="DB\DBHelper.cs" />
     <Compile Include="DB\IDB.cs" />
+    <Compile Include="EmotionRecognition\EmotionModel.cs" />
+    <Compile Include="EmotionRecognition\FeatureExtractor.cs" />
     <Compile Include="event_args.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
