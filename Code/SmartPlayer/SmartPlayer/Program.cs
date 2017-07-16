@@ -28,18 +28,18 @@ namespace SmartPlayer
 
             //MessageBox.Show("before Application.Run");
 
-            //Application.Run(new MainForm(null));
-            if (session != null)
-            {
-                //MessageBox.Show("PXCMSession is not null");
-                Application.Run(new MainForm(session));
-                session.Dispose();
-            }
+            Application.Run(new MainForm(null));
+            //if (session != null)
+            //{
+            //    //MessageBox.Show("PXCMSession is not null");
+            //    Application.Run(new MainForm(session));
+            //    session.Dispose();
+            //}
 
-            if(session == null)
-            {
-                MessageBox.Show("PXCMSession is null");
-            }
+            //if(session == null)
+            //{
+            //    MessageBox.Show("PXCMSession is null");
+            //}
         }
     }
 }
