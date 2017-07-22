@@ -128,6 +128,7 @@
     <Compile Include="Data\EntityData\Video.cs" />
     <Compile Include="DB\DBHelper.cs" />
     <Compile Include="DB\IDB.cs" />
+    <Compile Include="DB\Repo.cs" />
     <Compile Include="EmotionRecognition\EmotionModel.cs" />
     <Compile Include="EmotionRecognition\FeatureExtractor.cs" />
     <Compile Include="event_args.cs" />
