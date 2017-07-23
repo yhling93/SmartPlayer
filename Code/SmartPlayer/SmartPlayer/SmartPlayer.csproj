@@ -132,6 +132,12 @@
     <Compile Include="EmotionRecognition\EmotionModel.cs" />
     <Compile Include="EmotionRecognition\FeatureExtractor.cs" />
     <Compile Include="event_args.cs" />
+    <Compile Include="LogInForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LogInForm.Designer.cs">
+      <DependentUpon>LogInForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -147,6 +153,9 @@
     <Compile Include="Test\DBHelperTest.cs" />
     <Compile Include="VideoModule.cs" />
     <Compile Include="VlcPlayer.cs" />
+    <EmbeddedResource Include="LogInForm.resx">
+      <DependentUpon>LogInForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

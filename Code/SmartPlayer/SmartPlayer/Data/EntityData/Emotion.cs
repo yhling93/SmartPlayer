@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace SmartPlayer.Data.EntityData
 {
-    class Emotion
+    public class Emotion
     {
         public enum EmotionType
         {
-            Amused, Confused, Distracted, Concentrated, Thinking, Normal, Unknown, Surprised, Notetaking
+            Amused = 0, Confused, Distracted, Concentrated, Thinking, Normal, Unknown, Surprised, Notetaking
         } 
     }
 }

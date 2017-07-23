@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SmartPlayer.Data.EntityData
 {
-    class Course
+    public class Course
     {
         public enum Difficulty{
             Hard, Medium, Easy

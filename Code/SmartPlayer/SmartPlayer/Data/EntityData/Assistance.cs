@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SmartPlayer.Data.EntityData
 {
-    class Assistance
+    abstract public class Assistance
     {
         public enum AssistanceType
         {

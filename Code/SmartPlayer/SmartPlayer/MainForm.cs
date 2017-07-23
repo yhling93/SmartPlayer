@@ -12,11 +12,24 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using SmartPlayer.DB;
+using SmartPlayer.Data.EntityData;
 namespace SmartPlayer
 {
     public partial class MainForm : Form
     {
+        // 20170723
+        public Form loginForm;
+        public Course curCourse;
+        public CourseChapter curCourseChapter;
+        public List<Video> curVideoList;
+        public Dictionary<Emotion.EmotionType, List<VideoAssistance>> curVideoHelpMap;
+        public Emotion.EmotionType curEmotion;
+        public Thread emotionThread;
+        public EmotionModel emotionModel = new EmotionModel();
+        public Label curLabel;
+        public Dictionary<Emotion.EmotionType, Label> labelMap
+            = new Dictionary<Emotion.EmotionType, Label>();
         // 学习过程的Session
         public LearningSession learningSession;
 
@@ -51,15 +64,23 @@ namespace SmartPlayer
         /// <summary>
         /// 主窗体
         /// </summary>
-        public MainForm(PXCMSession session)
+        public MainForm(PXCMSession session, string stuName, string stuNo, Form lForm)
         {
             InitializeComponent();
+            CheckForIllegalCrossThreadCalls = false;
+            loginForm = lForm;
+
+            stuNameLabel.Text = stuName;
+            stuNoLabel.Text = stuNo;
+            stuAgeLabel.Text = "25";
+
             pb_Monitor.Paint += Pb_Monitor_Paint;
             Session = session;
             this.FormClosing += MainForm_FormClosing;
 
+            iniData();
             iniVideoModule();
-            iniPlayList();
+            // iniPlayList();
 
             if (!isOnline)
             {
@@ -92,6 +113,8 @@ namespace SmartPlayer
             }
             mVideoModule.release();
             closeSession();
+            emotionModel.stopDectecting();
+            loginForm.Close();
 
         }
 
@@ -186,6 +209,24 @@ namespace SmartPlayer
             videoVolumeTrackBar.SetRange(0, 100);
             videoVolumeTrackBar.Value = 50;
         }
+        private void iniData()
+        {
+            Repo.init();
+            foreach(string coursename in Repo.courses.Keys) {
+                courseListBox.Items.Add(coursename);
+            }
+            emotionModel.initUpdateAssistance(updateUiAccordingToEmotion);
+            labelMap.Add(Emotion.EmotionType.Amused, amusedLabel);
+            labelMap.Add(Emotion.EmotionType.Concentrated, concentratedLabel);
+            labelMap.Add(Emotion.EmotionType.Confused, confusedLabel);
+            labelMap.Add(Emotion.EmotionType.Distracted, distractedLabel);
+            labelMap.Add(Emotion.EmotionType.Normal, normalLabel);
+            labelMap.Add(Emotion.EmotionType.Notetaking, notetakingLabel);
+            labelMap.Add(Emotion.EmotionType.Surprised, surprisedLabel);
+            labelMap.Add(Emotion.EmotionType.Thinking, thinkingLabel);
+            labelMap.Add(Emotion.EmotionType.Unknown, unknownLabel);
+        }
+
         /// <summary>
         /// 初始化播放列表
         /// </summary>
@@ -193,10 +234,20 @@ namespace SmartPlayer
         {
             // 读取特定目录下的所有mp4文件
             string path = Environment.CurrentDirectory + "\\lecturevideo\\";
-            DirectoryInfo folder = new DirectoryInfo(path);
-            playList = new List<FileInfo>(folder.GetFiles("*.mp4"));
-            foreach (FileInfo file in playList)
-                videoListBox.Items.Add(file.Name);
+            //DirectoryInfo folder = new DirectoryInfo(path);
+            //playList = new List<FileInfo>(folder.GetFiles("*.mp4"));
+            //foreach (FileInfo file in playList)
+            //    videoListBox.Items.Add(file.Name);
+
+            playList = new List<FileInfo>();
+            // read fileinfo in video list
+            foreach (Video v in curVideoList)
+            {
+                videoListBox.Items.Add(v.VideoName);
+                FileInfo fileinfo = new FileInfo(path + v.VideoPath);
+                playList.Add(fileinfo);
+            }
+
             videoListBox.MouseDoubleClick += new MouseEventHandler(PlayVideo_DoubleClick);
             
             mVideoModule.setPlayList(playList);
@@ -211,6 +262,7 @@ namespace SmartPlayer
         /// <param name="e"></param>
         private void PlayVideo_DoubleClick(object sender, MouseEventArgs e)
         {
+            emotionModel.stopDectecting();
 
             int idx = videoListBox.IndexFromPoint(e.Location);
             if(idx == ListBox.NoMatches)
@@ -228,11 +280,16 @@ namespace SmartPlayer
                 //learningSession = null;
             }
 
+            curEmotion = Emotion.EmotionType.Normal;
+            normalLabel.ForeColor = Color.Red;
+            curLabel = normalLabel;
             videoListBox.SelectedIndex = idx;
+            curChapterLabel.Text = curVideoList[idx].VideoName;
+            curVideoHelpMap = Repo.assistances[curVideoList[idx]];
+            curVideoWatchTimeLabel.Text = "0";
+            curFinishLabel.Text = "0";
+
             //int idx = (sender as ListBox).SelectedIndex;
-
-
-
             curPlayFile = playList[idx];
             resetBtns();
 
@@ -249,6 +306,9 @@ namespace SmartPlayer
             videoProgressTrackBar.SetRange(0, mVideoModule.getVideoDuration());
             videoProgressTrackBar.Value = 0;
             videoProgressTimer.Start();
+
+                        emotionThread = new Thread(emotionModel.startDectecting);
+            emotionThread.Start();
         }
 
         private void reverseBtn_Click(object sender, EventArgs e)
@@ -491,6 +551,48 @@ namespace SmartPlayer
             //));
         }
 
+        private void courseListBox_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            int idx = courseListBox.IndexFromPoint(e.Location);
+            if (idx == ListBox.NoMatches)
+                return;
+            string selectedCourse = (string)courseListBox.SelectedItem;
+            curCourse = Repo.courses[selectedCourse];
+            curCourseChapter = Repo.courseDetails[curCourse];
+            curVideoList = curCourseChapter.Videos;
+            curCourseLabel.Text = curCourse.CourseName;
+            curCourseDescLabel.Text = curCourse.CourseDesc;
+            curCourseDiffLabel.Text = curCourse.CourseDifficulty.ToString();
+            iniPlayList();
+        }
+
         /**************** Learning Session ****************/
+
+        public void updateUiAccordingToEmotion(Emotion.EmotionType emotion)
+        {
+            curEmotion = emotion;
+            curLabel.ForeColor = Color.Black;
+            curLabel = labelMap[curEmotion];
+            curLabel.ForeColor = Color.Red;
+
+            List<VideoAssistance> helpList = curVideoHelpMap[emotion];
+            foreach (VideoAssistance va in helpList)
+            {
+                Assistance assistance = va.Assistance;
+                switch (assistance.assistanceType)
+                {
+                    case Assistance.AssistanceType.Book:
+                        book1.Load(Environment.CurrentDirectory + "\\bookimages\\" + ((BookAssistance)assistance).PictureUrl);
+                        break;
+                    case Assistance.AssistanceType.Course:
+                        lowLevelCourse1.Text = ((CourseAssistance)assistance).Course.CourseName;
+                        highLevelCourse1.Text = ((CourseAssistance)assistance).Course.CourseName;
+                        break;
+                    case Assistance.AssistanceType.Text:
+                        helpTextLabel.Text = ((TextAssistance)assistance).TextInfo;
+                        break;
+                }
+            }
+        }
     }
 }

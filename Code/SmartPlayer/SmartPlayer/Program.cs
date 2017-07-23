@@ -28,7 +28,8 @@ namespace SmartPlayer
 
             //MessageBox.Show("before Application.Run");
 
-            Application.Run(new MainForm(null));
+            Application.Run(new LogInForm());
+            //Application.Run(new MainForm(null));
             //if (session != null)
             //{
             //    //MessageBox.Show("PXCMSession is not null");
