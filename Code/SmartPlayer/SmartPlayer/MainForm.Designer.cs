@@ -68,8 +68,10 @@
             this.curCourseLabel = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.label10 = new System.Windows.Forms.Label();
+            this.modelComboBox = new System.Windows.Forms.ComboBox();
+            this.wrongBtn = new System.Windows.Forms.Button();
+            this.correctBtn = new System.Windows.Forms.Button();
             this.notetakingLabel = new System.Windows.Forms.Label();
             this.unknownLabel = new System.Windows.Forms.Label();
             this.normalLabel = new System.Windows.Forms.Label();
@@ -536,8 +538,10 @@
             // groupBox5
             // 
             this.groupBox5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox5.Controls.Add(this.button2);
-            this.groupBox5.Controls.Add(this.button1);
+            this.groupBox5.Controls.Add(this.label10);
+            this.groupBox5.Controls.Add(this.modelComboBox);
+            this.groupBox5.Controls.Add(this.wrongBtn);
+            this.groupBox5.Controls.Add(this.correctBtn);
             this.groupBox5.Controls.Add(this.notetakingLabel);
             this.groupBox5.Controls.Add(this.unknownLabel);
             this.groupBox5.Controls.Add(this.normalLabel);
@@ -549,28 +553,47 @@
             this.groupBox5.Controls.Add(this.amusedLabel);
             this.groupBox5.Location = new System.Drawing.Point(1014, 13);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(277, 101);
+            this.groupBox5.Size = new System.Drawing.Size(277, 185);
             this.groupBox5.TabIndex = 18;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "当前状态";
             // 
-            // button2
+            // label10
             // 
-            this.button2.Location = new System.Drawing.Point(167, 59);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(102, 31);
-            this.button2.TabIndex = 10;
-            this.button2.Text = "判断错误";
-            this.button2.UseVisualStyleBackColor = true;
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(19, 158);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(65, 12);
+            this.label10.TabIndex = 12;
+            this.label10.Text = "模型选择：";
             // 
-            // button1
+            // modelComboBox
             // 
-            this.button1.Location = new System.Drawing.Point(167, 19);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(102, 32);
-            this.button1.TabIndex = 9;
-            this.button1.Text = "判断正确";
-            this.button1.UseVisualStyleBackColor = true;
+            this.modelComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.modelComboBox.FormattingEnabled = true;
+            this.modelComboBox.Location = new System.Drawing.Point(97, 155);
+            this.modelComboBox.Name = "modelComboBox";
+            this.modelComboBox.Size = new System.Drawing.Size(172, 20);
+            this.modelComboBox.TabIndex = 11;
+            this.modelComboBox.SelectedIndexChanged += new System.EventHandler(this.modelComboBox_SelectedIndexChanged);
+            // 
+            // wrongBtn
+            // 
+            this.wrongBtn.Location = new System.Drawing.Point(144, 119);
+            this.wrongBtn.Name = "wrongBtn";
+            this.wrongBtn.Size = new System.Drawing.Size(125, 22);
+            this.wrongBtn.TabIndex = 10;
+            this.wrongBtn.Text = "判断错误";
+            this.wrongBtn.UseVisualStyleBackColor = true;
+            // 
+            // correctBtn
+            // 
+            this.correctBtn.Location = new System.Drawing.Point(5, 119);
+            this.correctBtn.Name = "correctBtn";
+            this.correctBtn.Size = new System.Drawing.Size(130, 23);
+            this.correctBtn.TabIndex = 9;
+            this.correctBtn.Text = "判断正确";
+            this.correctBtn.UseVisualStyleBackColor = true;
             // 
             // notetakingLabel
             // 
@@ -578,7 +601,7 @@
             this.notetakingLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.notetakingLabel.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.notetakingLabel.ForeColor = System.Drawing.Color.Black;
-            this.notetakingLabel.Location = new System.Drawing.Point(115, 76);
+            this.notetakingLabel.Location = new System.Drawing.Point(206, 88);
             this.notetakingLabel.Name = "notetakingLabel";
             this.notetakingLabel.Size = new System.Drawing.Size(31, 14);
             this.notetakingLabel.TabIndex = 8;
@@ -589,7 +612,7 @@
             this.unknownLabel.AutoSize = true;
             this.unknownLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.unknownLabel.ForeColor = System.Drawing.Color.Black;
-            this.unknownLabel.Location = new System.Drawing.Point(67, 76);
+            this.unknownLabel.Location = new System.Drawing.Point(110, 88);
             this.unknownLabel.Name = "unknownLabel";
             this.unknownLabel.Size = new System.Drawing.Size(31, 14);
             this.unknownLabel.TabIndex = 7;
@@ -599,7 +622,7 @@
             // 
             this.normalLabel.AutoSize = true;
             this.normalLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.normalLabel.Location = new System.Drawing.Point(21, 76);
+            this.normalLabel.Location = new System.Drawing.Point(7, 88);
             this.normalLabel.Name = "normalLabel";
             this.normalLabel.Size = new System.Drawing.Size(31, 14);
             this.normalLabel.TabIndex = 6;
@@ -609,7 +632,7 @@
             // 
             this.concentratedLabel.AutoSize = true;
             this.concentratedLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.concentratedLabel.Location = new System.Drawing.Point(115, 48);
+            this.concentratedLabel.Location = new System.Drawing.Point(206, 54);
             this.concentratedLabel.Name = "concentratedLabel";
             this.concentratedLabel.Size = new System.Drawing.Size(31, 14);
             this.concentratedLabel.TabIndex = 5;
@@ -619,7 +642,7 @@
             // 
             this.distractedLabel.AutoSize = true;
             this.distractedLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.distractedLabel.Location = new System.Drawing.Point(67, 48);
+            this.distractedLabel.Location = new System.Drawing.Point(110, 54);
             this.distractedLabel.Name = "distractedLabel";
             this.distractedLabel.Size = new System.Drawing.Size(31, 14);
             this.distractedLabel.TabIndex = 4;
@@ -629,7 +652,7 @@
             // 
             this.surprisedLabel.AutoSize = true;
             this.surprisedLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.surprisedLabel.Location = new System.Drawing.Point(21, 48);
+            this.surprisedLabel.Location = new System.Drawing.Point(7, 54);
             this.surprisedLabel.Name = "surprisedLabel";
             this.surprisedLabel.Size = new System.Drawing.Size(31, 14);
             this.surprisedLabel.TabIndex = 3;
@@ -639,7 +662,7 @@
             // 
             this.confusedLabel.AutoSize = true;
             this.confusedLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.confusedLabel.Location = new System.Drawing.Point(115, 20);
+            this.confusedLabel.Location = new System.Drawing.Point(206, 20);
             this.confusedLabel.Name = "confusedLabel";
             this.confusedLabel.Size = new System.Drawing.Size(31, 14);
             this.confusedLabel.TabIndex = 2;
@@ -649,7 +672,7 @@
             // 
             this.thinkingLabel.AutoSize = true;
             this.thinkingLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.thinkingLabel.Location = new System.Drawing.Point(67, 20);
+            this.thinkingLabel.Location = new System.Drawing.Point(110, 20);
             this.thinkingLabel.Name = "thinkingLabel";
             this.thinkingLabel.Size = new System.Drawing.Size(31, 14);
             this.thinkingLabel.TabIndex = 1;
@@ -659,7 +682,7 @@
             // 
             this.amusedLabel.AutoSize = true;
             this.amusedLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.amusedLabel.Location = new System.Drawing.Point(21, 20);
+            this.amusedLabel.Location = new System.Drawing.Point(7, 20);
             this.amusedLabel.Name = "amusedLabel";
             this.amusedLabel.Size = new System.Drawing.Size(31, 14);
             this.amusedLabel.TabIndex = 0;
@@ -670,9 +693,9 @@
             this.groupBox6.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox6.Controls.Add(this.helpTextLabel);
-            this.groupBox6.Location = new System.Drawing.Point(1014, 121);
+            this.groupBox6.Location = new System.Drawing.Point(1014, 204);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(277, 149);
+            this.groupBox6.Size = new System.Drawing.Size(277, 120);
             this.groupBox6.TabIndex = 19;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "相关资料";
@@ -682,7 +705,7 @@
             this.helpTextLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.helpTextLabel.Location = new System.Drawing.Point(3, 17);
             this.helpTextLabel.Name = "helpTextLabel";
-            this.helpTextLabel.Size = new System.Drawing.Size(271, 129);
+            this.helpTextLabel.Size = new System.Drawing.Size(271, 100);
             this.helpTextLabel.TabIndex = 0;
             this.helpTextLabel.Text = " ";
             // 
@@ -692,9 +715,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox8.Controls.Add(this.groupBox10);
             this.groupBox8.Controls.Add(this.groupBox9);
-            this.groupBox8.Location = new System.Drawing.Point(1014, 431);
+            this.groupBox8.Location = new System.Drawing.Point(1014, 485);
             this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(277, 156);
+            this.groupBox8.Size = new System.Drawing.Size(277, 102);
             this.groupBox8.TabIndex = 21;
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "推荐课程";
@@ -703,9 +726,9 @@
             // 
             this.groupBox10.Controls.Add(this.highLevelCourse2);
             this.groupBox10.Controls.Add(this.highLevelCourse1);
-            this.groupBox10.Location = new System.Drawing.Point(142, 22);
+            this.groupBox10.Location = new System.Drawing.Point(144, 20);
             this.groupBox10.Name = "groupBox10";
-            this.groupBox10.Size = new System.Drawing.Size(127, 127);
+            this.groupBox10.Size = new System.Drawing.Size(127, 71);
             this.groupBox10.TabIndex = 1;
             this.groupBox10.TabStop = false;
             this.groupBox10.Text = "进阶课程";
@@ -732,9 +755,9 @@
             // 
             this.groupBox9.Controls.Add(this.lowLevelCourse2);
             this.groupBox9.Controls.Add(this.lowLevelCourse1);
-            this.groupBox9.Location = new System.Drawing.Point(7, 23);
+            this.groupBox9.Location = new System.Drawing.Point(7, 20);
             this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(127, 127);
+            this.groupBox9.Size = new System.Drawing.Size(127, 73);
             this.groupBox9.TabIndex = 0;
             this.groupBox9.TabStop = false;
             this.groupBox9.Text = "基础课程";
@@ -763,7 +786,7 @@
             this.groupBox7.Controls.Add(this.book3);
             this.groupBox7.Controls.Add(this.book2);
             this.groupBox7.Controls.Add(this.book1);
-            this.groupBox7.Location = new System.Drawing.Point(1014, 276);
+            this.groupBox7.Location = new System.Drawing.Point(1014, 330);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Size = new System.Drawing.Size(277, 149);
             this.groupBox7.TabIndex = 20;
@@ -910,8 +933,8 @@
         private System.Windows.Forms.Label confusedLabel;
         private System.Windows.Forms.Label thinkingLabel;
         private System.Windows.Forms.Label amusedLabel;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button wrongBtn;
+        private System.Windows.Forms.Button correctBtn;
         private System.Windows.Forms.GroupBox groupBox6;
         private System.Windows.Forms.GroupBox groupBox8;
         private System.Windows.Forms.GroupBox groupBox7;
@@ -933,6 +956,8 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label curCourseDiffLabel;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.ComboBox modelComboBox;
     }
 }
 

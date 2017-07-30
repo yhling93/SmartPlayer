@@ -10,7 +10,7 @@ namespace SmartPlayer.Data.EntityData
     {
         public enum EmotionType
         {
-            Amused = 0, Confused, Distracted, Concentrated, Thinking, Normal, Unknown, Surprised, Notetaking
+            Amused = 1, Confused = 6, Distracted = 8, Concentrated = 11, Thinking = 4, Normal = 9, Unknown = 10, Surprised = 7, Notetaking = 5
         } 
     }
 }

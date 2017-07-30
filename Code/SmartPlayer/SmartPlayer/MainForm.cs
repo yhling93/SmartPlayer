@@ -80,6 +80,7 @@ namespace SmartPlayer
 
             iniData();
             iniVideoModule();
+            modelComboBox.DataSource = emotionModel.modelPathMap.Keys.ToList();
             // iniPlayList();
 
             if (!isOnline)
@@ -225,6 +226,7 @@ namespace SmartPlayer
             labelMap.Add(Emotion.EmotionType.Surprised, surprisedLabel);
             labelMap.Add(Emotion.EmotionType.Thinking, thinkingLabel);
             labelMap.Add(Emotion.EmotionType.Unknown, unknownLabel);
+            
         }
 
         /// <summary>
@@ -307,7 +309,7 @@ namespace SmartPlayer
             videoProgressTrackBar.Value = 0;
             videoProgressTimer.Start();
 
-                        emotionThread = new Thread(emotionModel.startDectecting);
+            emotionThread = new Thread(emotionModel.startDectecting);
             emotionThread.Start();
         }
 
@@ -391,7 +393,8 @@ namespace SmartPlayer
                 videoProgressTrackBar.Value = 0;
                 resetBtns();
                 videoProgressLabel.Text = string.Format("{0}/{1}", mVideoModule.getTimeString(0), mVideoModule.getTimeString(videoProgressTrackBar.Maximum));
-
+                emotionModel.stopDectecting();
+                emotionThread.Abort();
                 // For debug
                 // Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(learningSession));
 
@@ -568,7 +571,7 @@ namespace SmartPlayer
 
         /**************** Learning Session ****************/
 
-        public void updateUiAccordingToEmotion(Emotion.EmotionType emotion)
+        public void updateUiAccordingToEmotion(Emotion.EmotionType emotion, double[] pro)
         {
             curEmotion = emotion;
             curLabel.ForeColor = Color.Black;
@@ -593,6 +596,22 @@ namespace SmartPlayer
                         break;
                 }
             }
+
+            amusedLabel.Text = "愉悦：" + pro[0].ToString("#0.00");
+            thinkingLabel.Text = "思考：" + pro[1].ToString("#0.00");
+            notetakingLabel.Text = "笔记：" + pro[2].ToString("#0.00");
+            confusedLabel.Text = "困惑：" + pro[3].ToString("#0.00");
+            surprisedLabel.Text = "惊讶：" + pro[4].ToString("#0.00");
+            distractedLabel.Text = "分心：" + pro[5].ToString("#0.00");
+            normalLabel.Text = "普通：" + pro[6].ToString("#0.00");
+            unknownLabel.Text = "未知：" + pro[7].ToString("#0.00");
+            concentratedLabel.Text = "专注：" + pro[8].ToString("#0.00");
+
+        }
+
+        private void modelComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            emotionModel.loadModel(modelComboBox.SelectedItem.ToString());
         }
     }
 }
