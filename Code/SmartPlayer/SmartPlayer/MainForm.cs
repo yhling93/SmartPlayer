@@ -32,19 +32,14 @@ namespace SmartPlayer
             = new Dictionary<Emotion.EmotionType, Label>();
         // 学习过程的Session
         public LearningSession learningSession;
-
         // RealSense需要,维护一个session
         public PXCMSession Session;
-
         //record
         private RenderStreams streaming = new RenderStreams();
-
         // m_bitmap的lock
         private readonly object m_bitmapLock = new object();
-
         // 视频流显示的每帧缓存
         private Bitmap m_bitmap;
-
         // 描述主界面是否暂停
         public bool Stopped = false;
 
@@ -61,6 +56,8 @@ namespace SmartPlayer
         private IStore mStoreModule;
         private bool isOnline = false;
 
+        // RealSense相关
+
         /// <summary>
         /// 主窗体
         /// </summary>
@@ -75,7 +72,9 @@ namespace SmartPlayer
             stuAgeLabel.Text = "25";
 
             pb_Monitor.Paint += Pb_Monitor_Paint;
-            Session = session;
+            // Session = session;
+            Session = PXCMSession.CreateInstance();
+
             this.FormClosing += MainForm_FormClosing;
 
             iniData();
@@ -93,9 +92,9 @@ namespace SmartPlayer
             }
 
             // Sleep(200);
-            //var thread = new Thread(Go);
-            //thread.IsBackground = true;
-            //thread.Start();
+            var thread = new Thread(Go);
+            thread.IsBackground = true;
+            thread.Start();
         }
 
         /// <summary>
@@ -126,8 +125,8 @@ namespace SmartPlayer
         {
             var trackModule = new TrackModule(this);
             //trackModule.NaivePipeline();
-            //trackModule.FacePipeLine();
-            trackModule.HandPipeLine();
+            trackModule.FacePipeLine();
+            //trackModule.HandPipeLine();
         }
 
         /// <summary>

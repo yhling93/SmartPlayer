@@ -27,6 +27,9 @@ namespace SmartPlayer.RealSense
 
         private const int NUM_PERSONS = 1;
 
+        public FacialExpression Expression { get; set; }
+        public FacialLandmarks Landmarks { get; set; }
+
         /// <summary>
         /// 构造函数，将窗体传进来
         /// </summary>
@@ -34,6 +37,9 @@ namespace SmartPlayer.RealSense
         public TrackModule(MainForm form)
         {
             m_form = form;
+
+            Expression = new FacialExpression();
+            Landmarks = new FacialLandmarks();
             //dbhelper = new DBHelper();
             //InteractionEvent ievent = new InteractionEvent();
             //ievent.eventType = EventType.PauseEvent;
@@ -236,9 +242,40 @@ namespace SmartPlayer.RealSense
                             }
 
                             // 存
+                            //PXCMFaceData.Face face = faceData.QueryFaceByIndex(0);
+                            //SaveFaceLandmarkData(face);
+                            //SaveFacialExpressionData(face);
+
+                            // 保存至当前变量中
                             PXCMFaceData.Face face = faceData.QueryFaceByIndex(0);
-                            SaveFaceLandmarkData(face);
-                            SaveFacialExpressionData(face);
+                            Landmarks.updateData(face);
+
+                            PXCMFaceData.ExpressionsData edata = face.QueryExpressions();
+                            lock (EmotionModel.svmFeature)
+                            {
+                                if (edata != null)
+                                {
+                                    int startIdx = EmotionModel.FaceExpressionStartIdx;
+                                        for (int i = 0; i < 22; i++)
+                                        {
+                                            PXCMFaceData.ExpressionsData.FaceExpressionResult score;
+                                            edata.QueryExpression((PXCMFaceData.ExpressionsData.FaceExpression)i, out score);
+                                            Expression.facialExpressionIndensity[i] = score.intensity;
+
+                                            EmotionModel.svmFeature[startIdx + i].Index = startIdx + i;
+                                            EmotionModel.svmFeature[startIdx + i].Value = score.intensity;
+                                        }
+                                }
+
+                                double[] features = new double[EmotionModel.FaceLandmarkCnt + EmotionModel.FaceExpressionCnt];
+
+                                int startIdx2 = EmotionModel.FaceLandmarkStartIdx;
+                                for (int i = 0; i < EmotionModel.FaceLandmarkCnt; i++)
+                                {
+                                    EmotionModel.svmFeature[startIdx2 + i].Index = startIdx2 + i;
+                                    EmotionModel.svmFeature[startIdx2 + i].Value = Landmarks.Landmarks[i];
+                                }
+                            }
 
                             m_form.UpdatePic();
 
@@ -554,7 +591,8 @@ namespace SmartPlayer.RealSense
 #if DEBUG
             //Console.WriteLine(flm.ToString());
 #endif
-            dbhelper.saveEntity(flm);           
+            // dbhelper.saveEntity(flm);
+            Console.WriteLine(flm.ToString());
         }
 
         private void SaveFacialExpressionData(PXCMFaceData.Face face)
