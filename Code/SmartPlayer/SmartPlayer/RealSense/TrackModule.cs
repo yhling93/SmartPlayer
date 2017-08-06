@@ -267,6 +267,8 @@ namespace SmartPlayer.RealSense
                                         }
                                 }
 
+                                
+
                                 double[] features = new double[EmotionModel.FaceLandmarkCnt + EmotionModel.FaceExpressionCnt];
 
                                 int startIdx2 = EmotionModel.FaceLandmarkStartIdx;
