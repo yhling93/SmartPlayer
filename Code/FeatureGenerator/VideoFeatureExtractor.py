@@ -26,8 +26,6 @@ def extractFeatureFromFile(folderPath, windowSize):
     sessionFile = open(folderPath + '/session')
     periodFile = open(folderPath + '/period')
     momentFile = open(folderPath + '/moment')
-    outputFilePath = '%s%s%s' % (folderPath, '/interactionFeatureWithWindowSize', str(windowSize))
-    outputFile = open(outputFilePath, 'w')
 
     lines = sessionFile.readlines()
     if not len(lines) == 2:
@@ -47,6 +45,9 @@ def extractFeatureFromFile(folderPath, windowSize):
     if sessionDuration < 120:
         print folderPath, ' Session Too Short!'
         return
+
+    outputFilePath = '%s%s%s' % (folderPath, '/interactionFeatureWithWindowSize', str(windowSize))
+    outputFile = open(outputFilePath, 'w')
 
     for i in range(0, sessionDuration):
         timeMomentEventList.append([])
