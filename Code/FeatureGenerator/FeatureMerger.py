@@ -72,7 +72,7 @@ def HandleLabel(labelLines, target, count):
     startPlayTime = int(labelFeature[0])
     # set the label unknown from 0 to startPlayTime
     for ts in range(0, startPlayTime + 1):
-        target[i] = 10
+        target[ts] = 10
         #target[ts] = '10 ' + target[ts]
 
     last_time = startPlayTime
