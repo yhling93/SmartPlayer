@@ -45,6 +45,12 @@ namespace SmartPlayer
                 /* Create an instance of the PXCMSenseManager interface */
                 PXCMSenseManager sm = PXCMSenseManager.CreateInstance();
 
+                if (sm == null)
+                {
+                    MessageBox.Show("当前对象为空！");
+                    return;
+                }
+
                 /* Optional: if playback or recoridng */
                 if (File != null)
                     sm.captureManager.SetFileName(File, this.isRecord);
@@ -94,6 +100,7 @@ namespace SmartPlayer
             }
             catch (Exception e)
             {
+                MessageBox.Show(e.Message);
                 //MessageBox.Show(e.GetType().ToString());
             }
         }

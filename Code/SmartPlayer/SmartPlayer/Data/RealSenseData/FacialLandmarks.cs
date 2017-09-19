@@ -15,6 +15,7 @@ namespace SmartPlayer.Data.RealSenseData
         public Dictionary<PXCMFaceData.LandmarksGroupType, PXCMPoint3DF32[]> landmarksData { set; get; }
         // 发生时间
         public CustomTime happenTS { set; get; }
+        public double[] Landmarks = new double[EmotionModel.FaceLandmarkCnt];
 
         public FacialLandmarks()
         {
@@ -27,7 +28,7 @@ namespace SmartPlayer.Data.RealSenseData
 
             // get the landmark data
             var landmarkGroupTypes = Enum.GetValues(typeof(PXCMFaceData.LandmarksGroupType)).Cast<PXCMFaceData.LandmarksGroupType>();
-            
+            int featureIdx = 0;
             // 对于每个LandmarkPoint转换成成员变量中的world属性
             foreach (var landmarkGroupType in landmarkGroupTypes)
             {
@@ -39,10 +40,14 @@ namespace SmartPlayer.Data.RealSenseData
                 for (int i = 0; i < points.Length; i++)
                 {
                     Point3DArray[i] = points[i].world;
+                    // 把脸部特征放入数组中
+                    Landmarks[featureIdx++] = points[i].world.x;
+                    Landmarks[featureIdx++] = points[i].world.y;
+                    Landmarks[featureIdx++] = points[i].world.z;
                 }
                 
                 // 将world坐标加进去
-                landmarksData.Add(landmarkGroupType, Point3DArray);
+                // landmarksData.Add(landmarkGroupType, Point3DArray);
             }
         }
 

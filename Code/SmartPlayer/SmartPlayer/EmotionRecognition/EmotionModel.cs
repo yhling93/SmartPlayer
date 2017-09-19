@@ -16,9 +16,18 @@ namespace SmartPlayer
         public bool stopFlag = false; // 线程停止标识
         public const int featureNum = 265; // 特征数量
         public Emotion.EmotionType curEmotion; // 当前情感分类
-
+        
         public SVMModel svmModel; // 模型
         public static SVMNode[] svmFeature = new SVMNode[featureNum]; // 特征
+
+        // 0-8: video feature 9-242: landmark feature 243-264: expression feature
+        public static int VideoFeatureStartIdx = 0;
+        public static int VideoFeatureCnt = 9;
+        public static int FaceLandmarkStartIdx = 9;
+        public static int FaceLandmarkCnt = 234;
+        public static int FaceExpressionStartIdx = 243;
+        public static int FaceExpressionCnt = 22;
+        public static int FaceFeatureCnt = FaceExpressionCnt + FaceLandmarkCnt;
 
 
         // public static Dictionary<int, int> indexEmotionMap = new Dictionary<int, int>();
@@ -74,6 +83,9 @@ namespace SmartPlayer
                     double[] pro = new double[9]; // 输出概率队列
                     int val = (int)SVM.PredictProbability(svmModel, svmFeature, out pro); // 预测分类及每个分类的概率
                     updateDelegate.Invoke((Emotion.EmotionType)val, pro); // 回调函数更新界面
+                    for (int i = 0; i < featureNum; i++)
+                        Console.Write(svmFeature[i].Value.ToString() + '\t');
+                    Console.WriteLine("");
                 }
                 Thread.Sleep(1000); // 线程暂停1秒，即每秒识别一次感情
             }

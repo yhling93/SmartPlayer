@@ -27,6 +27,9 @@ namespace SmartPlayer.RealSense
 
         private const int NUM_PERSONS = 1;
 
+        public FacialExpression Expression { get; set; }
+        public FacialLandmarks Landmarks { get; set; }
+
         /// <summary>
         /// 构造函数，将窗体传进来
         /// </summary>
@@ -34,6 +37,9 @@ namespace SmartPlayer.RealSense
         public TrackModule(MainForm form)
         {
             m_form = form;
+
+            Expression = new FacialExpression();
+            Landmarks = new FacialLandmarks();
             //dbhelper = new DBHelper();
             //InteractionEvent ievent = new InteractionEvent();
             //ievent.eventType = EventType.PauseEvent;
@@ -236,9 +242,44 @@ namespace SmartPlayer.RealSense
                             }
 
                             // 存
+                            //PXCMFaceData.Face face = faceData.QueryFaceByIndex(0);
+                            //SaveFaceLandmarkData(face);
+                            //SaveFacialExpressionData(face);
+
+                            // 获取脸部特征点数据
                             PXCMFaceData.Face face = faceData.QueryFaceByIndex(0);
-                            SaveFaceLandmarkData(face);
-                            SaveFacialExpressionData(face);
+                            Landmarks.updateData(face);
+
+                            // 获取表情数据
+                            PXCMFaceData.ExpressionsData edata = face.QueryExpressions();
+
+                            // 多线程加锁，数据同步，与VideoModule会发生竞争
+                            lock (EmotionModel.svmFeature)
+                            {
+                                if (edata != null)
+                                {
+                                    // 提取表情数据
+                                    int startIdx = EmotionModel.FaceExpressionStartIdx;
+                                        for (int i = 0; i < 22; i++)
+                                        {
+                                            PXCMFaceData.ExpressionsData.FaceExpressionResult score;
+                                            edata.QueryExpression((PXCMFaceData.ExpressionsData.FaceExpression)i, out score);
+                                            Expression.facialExpressionIndensity[i] = score.intensity;
+                                            // 设置SVM Feature
+                                            EmotionModel.svmFeature[startIdx + i].Index = startIdx + i;
+                                            EmotionModel.svmFeature[startIdx + i].Value = score.intensity;
+                                        }
+                                }
+
+                                // 提取特征点位置数据
+                                int startIdx2 = EmotionModel.FaceLandmarkStartIdx;
+                                for (int i = 0; i < EmotionModel.FaceLandmarkCnt; i++)
+                                {
+                                    // 设置SVM Feature
+                                    EmotionModel.svmFeature[startIdx2 + i].Index = startIdx2 + i;
+                                    EmotionModel.svmFeature[startIdx2 + i].Value = Landmarks.Landmarks[i];
+                                }
+                            }
 
                             m_form.UpdatePic();
 
@@ -554,7 +595,8 @@ namespace SmartPlayer.RealSense
 #if DEBUG
             //Console.WriteLine(flm.ToString());
 #endif
-            dbhelper.saveEntity(flm);           
+            // dbhelper.saveEntity(flm);
+            Console.WriteLine(flm.ToString());
         }
 
         private void SaveFacialExpressionData(PXCMFaceData.Face face)

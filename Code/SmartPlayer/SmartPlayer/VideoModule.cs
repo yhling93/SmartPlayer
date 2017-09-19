@@ -35,6 +35,13 @@ namespace SmartPlayer
 
         private LearningSession curSession; // 当前会话
 
+        public enum VideoFeature
+        {
+            PLAY = 0, PAUSE, FASTFORWARD, REWIND, FORWARDSKIP, REVERSESKIP, FULLAASCREEN, PLAYTIME, RATE
+        }
+        public const int videoFeatureNum = 9;
+        // 0:play, 1:pause, 2:fastforward, 3:rewind, 4:forwardskip, 5:reverseskip, 6:fullscreen 7:playtime, 8:rate
+
         // 时段事件
         private FastForwardEvent fastForwardEvent;
         private RewindEvent rewindEvent;
@@ -91,6 +98,30 @@ namespace SmartPlayer
             isStopped = false;
             playSpeed = 1;
 
+            lock (EmotionModel.svmFeature)
+            {
+
+                EmotionModel.svmFeature[0].Index = 0; // play
+                EmotionModel.svmFeature[0].Value = 1; // true
+                EmotionModel.svmFeature[1].Index = 1; // pause
+                EmotionModel.svmFeature[1].Value = 0; // false
+                EmotionModel.svmFeature[2].Index = 2; // fastforward
+                EmotionModel.svmFeature[2].Value = 0; // false
+                EmotionModel.svmFeature[3].Index = 3; // rewind
+                EmotionModel.svmFeature[3].Value = 0; // false
+                EmotionModel.svmFeature[4].Index = 4; // forwardskip
+                EmotionModel.svmFeature[4].Value = 0; // false
+                EmotionModel.svmFeature[5].Index = 5; // reverseskip
+                EmotionModel.svmFeature[5].Value = 0; // false
+                EmotionModel.svmFeature[6].Index = 6; // fullscreen
+                EmotionModel.svmFeature[6].Value = 0; // false
+                EmotionModel.svmFeature[7].Index = 7; // playtime
+                EmotionModel.svmFeature[7].Value = 1; // 1
+                EmotionModel.svmFeature[8].Index = 8; // rate
+                EmotionModel.svmFeature[8].Value = 1; // 1
+            }
+
+
             //featureExtractThread = new Thread(featureExtract);
             //featureExtractThread.Start();
 
@@ -103,6 +134,11 @@ namespace SmartPlayer
 
         public void play()
         {
+            lock (EmotionModel.svmFeature)
+            {
+                EmotionModel.svmFeature[0].Value = 1;
+                EmotionModel.svmFeature[1].Value = 0;
+            }
             // 创建PlayEvent
             PlayEvent e = (PlayEvent)EventFactory.createMomentEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), MomentEventType.PLAY);
             storeModule.saveMomentEvent(e);
@@ -115,6 +151,11 @@ namespace SmartPlayer
 
         public void pause()
         {
+            lock (EmotionModel.svmFeature)
+            {
+                EmotionModel.svmFeature[0].Value = 0;
+                EmotionModel.svmFeature[1].Value = 1;
+            }
             // 创建PauseEvent
             PauseEvent e = (PauseEvent)EventFactory.createMomentEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), MomentEventType.PAUSE);
             storeModule.saveMomentEvent(e);
@@ -129,6 +170,11 @@ namespace SmartPlayer
         {
             if (curSession != null)
             {
+                lock (EmotionModel.svmFeature)
+                {
+                    for (int i = 0; i < videoFeatureNum; i++)
+                        EmotionModel.svmFeature[i].Value = 0;
+                }
                 // 创建StopEvent
                 StopEvent e = (StopEvent)EventFactory.createMomentEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), MomentEventType.STOP);
                 storeModule.saveMomentEvent(e);
@@ -144,6 +190,10 @@ namespace SmartPlayer
         {
             if(this.isPlaying && forwardFlag && !flag)
             {
+                lock (EmotionModel.svmFeature)
+                {
+                    EmotionModel.svmFeature[(int)VideoFeature.FASTFORWARD].Value = 0;
+                }
                 forwardFlag = false;
                 EventFactory.finishPeriodEvent(fastForwardEvent, (int)mPlayer.GetPlayTime());
                 storeModule.savePeriodEvent(fastForwardEvent);
@@ -153,6 +203,10 @@ namespace SmartPlayer
                 fastForwardEvent = null;
             } else if(this.isPlaying && !forwardFlag && flag)
             {
+                lock (EmotionModel.svmFeature)
+                {
+                    EmotionModel.svmFeature[(int)VideoFeature.FASTFORWARD].Value = 1;
+                }
                 // 创建快进事件
                 fastForwardEvent = (FastForwardEvent) EventFactory.startPeriodEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), PeriodEventType.FAST_FORWARD);
 
@@ -188,6 +242,10 @@ namespace SmartPlayer
         {
             if (this.isPlaying && reverseFlag && !flag)
             {
+                lock (EmotionModel.svmFeature)
+                {
+                    EmotionModel.svmFeature[(int)VideoFeature.REWIND].Value = 0;
+                }
                 reverseFlag = false;
                 EventFactory.finishPeriodEvent(rewindEvent, (int)mPlayer.GetPlayTime());
                 storeModule.savePeriodEvent(rewindEvent);
@@ -198,6 +256,10 @@ namespace SmartPlayer
             }
             else if (this.isPlaying && !reverseFlag && flag)
             {
+                lock (EmotionModel.svmFeature)
+                {
+                    EmotionModel.svmFeature[(int)VideoFeature.REWIND].Value = 1;
+                }
                 // 创建快退事件
                 rewindEvent = (RewindEvent)EventFactory.startPeriodEvent(curSession.SessionID, (int)mPlayer.GetPlayTime(), PeriodEventType.REWIND);
                 // for debug
@@ -245,18 +307,34 @@ namespace SmartPlayer
             skipEndVideoTS = getPlayTime();
             if(skipEndVideoTS > skipStartVideoTS)
             {
+                lock (EmotionModel.svmFeature)
+                {
+                    EmotionModel.svmFeature[(int)VideoFeature.FORWARDSKIP].Value = 1;
+                }
                 ForwardSkipEvent forwardSkipEvent = new ForwardSkipEvent(undeterminedSkipEvent);
                 EventFactory.finishPeriodEvent(forwardSkipEvent, skipEndVideoTS);
                 storeModule.savePeriodEvent(forwardSkipEvent);
                 // for debug
                 Console.WriteLine(JsonConvert.SerializeObject(forwardSkipEvent));
+                lock (EmotionModel.svmFeature)
+                {
+                    EmotionModel.svmFeature[(int)VideoFeature.FORWARDSKIP].Value = 0;
+                }
             } else if(skipEndVideoTS < skipStartVideoTS)
             {
+                lock (EmotionModel.svmFeature)
+                {
+                    EmotionModel.svmFeature[(int)VideoFeature.REVERSESKIP].Value = 1;
+                }
                 ReverseSkipEvent reverseSkipEvent = new ReverseSkipEvent(undeterminedSkipEvent);
                 EventFactory.finishPeriodEvent(reverseSkipEvent, skipEndVideoTS);
                 storeModule.savePeriodEvent(reverseSkipEvent);
                 // for debug
                 Console.WriteLine(JsonConvert.SerializeObject(reverseSkipEvent));
+                lock (EmotionModel.svmFeature)
+                {
+                    EmotionModel.svmFeature[(int)VideoFeature.REVERSESKIP].Value = 0;
+                }
             }
             undeterminedSkipEvent = null;
             skipStartVideoTS = 0;
@@ -302,12 +380,20 @@ namespace SmartPlayer
             if(curSession != null) {
                 if (isFullScreen)
                 {
+                    lock (EmotionModel.svmFeature)
+                    {
+                        EmotionModel.svmFeature[(int)VideoFeature.FULLAASCREEN].Value = 1;
+                    }
                     // 创建进入全屏事件
                     FullScreenEnterEvent e = (FullScreenEnterEvent) EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.FULL_SCREEN_ENTER);
                     // for debug
                     Console.WriteLine(JsonConvert.SerializeObject(e));
                 } else
                 {
+                    lock (EmotionModel.svmFeature)
+                    {
+                        EmotionModel.svmFeature[(int)VideoFeature.FULLAASCREEN].Value = 0;
+                    }
                     // 创建退出全屏事件
                     FullScreenExitEvent e = (FullScreenExitEvent)EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.FULL_SCREEN_EXIT);
                     // for debug
@@ -320,6 +406,10 @@ namespace SmartPlayer
         {
             if (curSession != null)
             {
+                lock (EmotionModel.svmFeature)
+                {
+                    EmotionModel.svmFeature[(int)VideoFeature.RATE].Value = 1.5f;
+                }
                 mPlayer.SetRate(1.5f);
                 // 创建播放速率变化事件
                 PlayRateChangeEvent e = (PlayRateChangeEvent)EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.PLAY_RATE_CHANGE);
@@ -334,6 +424,10 @@ namespace SmartPlayer
         {
             if (curSession != null)
             {
+                lock (EmotionModel.svmFeature)
+                {
+                    EmotionModel.svmFeature[(int)VideoFeature.RATE].Value = 0.5f;
+                }
                 mPlayer.SetRate(0.5f);
                 // 创建播放速率变化事件
                 PlayRateChangeEvent e = (PlayRateChangeEvent)EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.PLAY_RATE_CHANGE);
@@ -349,6 +443,10 @@ namespace SmartPlayer
         {
             if (curSession != null)
             {
+                lock (EmotionModel.svmFeature)
+                {
+                    EmotionModel.svmFeature[(int)VideoFeature.RATE].Value = 1.0f;
+                }
                 mPlayer.SetRate(1f);
                 // 创建播放速率变化事件
                 PlayRateChangeEvent e = (PlayRateChangeEvent)EventFactory.createMomentEvent(curSession.SessionID, getPlayTime(), MomentEventType.PLAY_RATE_CHANGE);
