@@ -24,7 +24,7 @@ namespace SmartPlayer
 
            // MessageBox.Show("before create PXCMSession Instance");
 
-            PXCMSession session = PXCMSession.CreateInstance();
+            // PXCMSession session = PXCMSession.CreateInstance();
 
             //MessageBox.Show("before Application.Run");
 

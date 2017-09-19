@@ -21,7 +21,10 @@ namespace SmartPlayer
         {
             string name = stuNameBox.Text;
             string no = stuNoBox.Text;
-            MainForm main = new MainForm(null, name, no, this);
+
+            PXCMSession session = PXCMSession.CreateInstance();
+
+            MainForm main = new MainForm(session, name, no, this);
             main.Show();
             //this.Close();
             this.Hide();
