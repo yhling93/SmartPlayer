@@ -1,3 +1,4 @@
+# This python script is used to generate feature in each folder
 from sys import argv
 import os
 import re

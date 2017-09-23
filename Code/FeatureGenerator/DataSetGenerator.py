@@ -1,5 +1,8 @@
+# This python script read data set from folders and merge them into a whole data set
 import os
 import random
+
+SMOTE_MODE = True
 
 def singleDataSetGenerator():
     windowSize = [5, 10]
@@ -32,9 +35,9 @@ def handleRawFeatureLines(featureLines):
     # random sampling to target ratio
     for label in dataMap.keys():
         partion = 1
-        if label == 9:
+        if label == 9 and not SMOTE_MODE:
             partion = 3
-        if label == 10:
+        if label == 10 and not SMOTE_MODE:
             partion = 2
         random.shuffle(dataMap[label])
         oriCount = len(dataMap[label])
@@ -61,6 +64,19 @@ def writeToFile(trainSet, testSet, outputFileNamePrefix):
     outTestFile.close()
 
 if __name__ == '__main__':
+    targetDir = 'E:\Datas\wholeSet'
+    if SMOTE_MODE:
+        dataSetFileNames = { 'dataset_appearance_smote',
+                        'dataset_interactionWithWindowSize5_smote', 'dataset_interactionWithWindowSize10_smote',
+                        'dataset_mergedWithWindowSize5_smote', 'dataset_mergedWithWindowSize10_smote' }
+        for dataSetName in dataSetFileNames:
+            file = open(targetDir + '/' + dataSetName)
+            lines = file.readlines()
+
+            # handle data set
+            trainSet, testSet = handleRawFeatureLines(lines)
+            writeToFile(trainSet, testSet, targetDir + '/' + dataSetName)
+        exit(0)
 
     targetRatio = 0.8
     folders = ['E:\Datas\\20170218\\Interaction_Data', 'E:\Datas\\20170319\\Interaction_Data']
