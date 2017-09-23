@@ -13,7 +13,13 @@ paramDict = {'dataset_interactionWithWindowSize10':MyParam(128, 0.03125),
              'dataset_interactionWithWindowSize5':MyParam(8.0, 8.0),
              'dataset_appearance':MyParam(8.0, 0.000030517578125),
              'dataset_mergedWithWindowSize5':MyParam(8.0, 0.000030517578125),
-             'dataset_mergedWithWindowSize10':MyParam(128.0, 0.000030517578125) }
+             'dataset_mergedWithWindowSize10':MyParam(128.0, 0.000030517578125)}
+
+smoteParamDict = {'dataset_interactionWithWindowSize10_smote':MyParam(32768, 0.125),
+             'dataset_interactionWithWindowSize5_smote':MyParam(32768, 0.125),
+             'dataset_appearance_smote':MyParam(8.0, 0.0001220703125),
+             'dataset_mergedWithWindowSize5_smote':MyParam(32768, 0.000030517578125),
+             'dataset_mergedWithWindowSize10_smote':MyParam(32.0, 0.000030517578125)}
 
 def SvmTrainProcess(dataSetFile, modelFilePath):
     print '-------------- SVM Train Start --------------'
@@ -33,7 +39,7 @@ def SvmPredictProcess(testSetFile, modelFilePath):
     os.system(command)
 
 if __name__ == '__main__':
-    for keys in paramDict.keys():
+    for keys in smoteParamDict.keys():
         modelFilePath = dataSetDir + '/' + keys + '.model'
         SvmTrainProcess(keys, modelFilePath)
         SvmPredictProcess(keys, modelFilePath)
