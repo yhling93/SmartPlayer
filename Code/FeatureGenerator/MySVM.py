@@ -1,7 +1,7 @@
 import os
 
-train_exe_path = "F:\libsvm-3.22\windows\svm-train.exe"
-predict_exe_path = "F:\libsvm-3.22\windows\svm-predict.exe"
+train_exe_path = "E:\libsvm-3.22\windows\svm-train.exe"
+predict_exe_path = "E:\libsvm-3.22\windows\svm-predict.exe"
 dataSetDir = "E:\Datas\wholeSet"
 
 class MyParam(object):
@@ -25,7 +25,7 @@ def SvmTrainProcess(dataSetFile, modelFilePath):
     print '-------------- SVM Train Start --------------'
     dataSetFilePath = dataSetDir + '/' + dataSetFile + '_train'
     command = train_exe_path
-    command += ' -d 3 -h 0 -t 1 -b 1 -c %s -g %s % s %s'%(str(paramDict[dataSetFile].c), str(paramDict[dataSetFile].g), dataSetFilePath, modelFilePath)
+    command += ' -d 3 -h 0 -t 1 -b 1 -c %s -g %s % s %s'%(str(smoteParamDict[dataSetFile].c), str(smoteParamDict[dataSetFile].g), dataSetFilePath, modelFilePath)
     print command
     os.system(command)
 

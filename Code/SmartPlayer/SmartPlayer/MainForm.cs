@@ -125,7 +125,13 @@ namespace SmartPlayer
         {
             var trackModule = new TrackModule(this);
             //trackModule.NaivePipeline();
-            trackModule.FacePipeLine();
+            try
+            {
+                trackModule.FacePipeLine();
+            } catch(Exception e)
+            {
+                // handle exception
+            }
             //trackModule.HandPipeLine();
         }
 

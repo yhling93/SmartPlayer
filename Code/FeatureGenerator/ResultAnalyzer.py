@@ -1,7 +1,8 @@
 
 resultList = ['dataset_interactionWithWindowSize10', 'dataset_interactionWithWindowSize5', 'dataset_appearance',
               'dataset_mergedWithWindowSize5', 'dataset_mergedWithWindowSize10']
-
+smoteResultList = ['dataset_interactionWithWindowSize10_smote', 'dataset_interactionWithWindowSize5_smote', 'dataset_appearance_smote',
+              'dataset_mergedWithWindowSize5_smote', 'dataset_mergedWithWindowSize10_smote']
 ReverseLabelMap = {1:'amuse', 2:'tired', 3:'despise',
         4:'thinking', 5:'notetaking', 6:'confused',
         7:'surprised', 8:'distracted', 9:'normal',
@@ -52,5 +53,5 @@ def Statistics(dataSetName):
     print 'total accuracy: ', 1.0 * matchCnt / totalCnt
 
 if __name__ == '__main__':
-    for dataSetName in resultList:
+    for dataSetName in smoteResultList:
         Statistics(dataSetName)

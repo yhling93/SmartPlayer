@@ -81,11 +81,17 @@ namespace SmartPlayer
                 lock (svmFeature)
                 {
                     double[] pro = new double[9]; // 输出概率队列
-                    int val = (int)SVM.PredictProbability(svmModel, svmFeature, out pro); // 预测分类及每个分类的概率
-                    updateDelegate.Invoke((Emotion.EmotionType)val, pro); // 回调函数更新界面
-                    for (int i = 0; i < featureNum; i++)
-                        Console.Write(svmFeature[i].Value.ToString() + '\t');
-                    Console.WriteLine("");
+                    try
+                    {
+                        int val = (int)SVM.PredictProbability(svmModel, svmFeature, out pro); // 预测分类及每个分类的概率
+                        updateDelegate.Invoke((Emotion.EmotionType)val, pro); // 回调函数更新界面
+                        for (int i = 0; i < featureNum; i++)
+                            Console.Write(svmFeature[i].Value.ToString() + '\t');
+                        Console.WriteLine("");
+                    } catch(Exception e)
+                    {
+                        // handle exception
+                    }
                 }
                 Thread.Sleep(1000); // 线程暂停1秒，即每秒识别一次感情
             }

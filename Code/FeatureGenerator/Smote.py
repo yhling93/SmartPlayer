@@ -1,4 +1,6 @@
 from imblearn.over_sampling import SMOTE
+from imblearn.combine import SMOTETomek
+from imblearn.combine import SMOTEENN
 from collections import Counter
 import numpy as np
 dataSetNames = ['dataset_interactionWithWindowSize5', 'dataset_interactionWithWindowSize10',
@@ -36,12 +38,14 @@ if __name__ == '__main__':
 
         print('Original dataset shape {}'.format(Counter(Y)))
 
-        sm = SMOTE(kind='svm')
+        #sm = SMOTE(kind='borderline1', ratio='majority')
+        #X_res, Y_res = sm.fit_sample(X,Y)
+        smt = SMOTETomek(random_state=42)
+        X_res, Y_res = smt.fit_sample(X,Y)
 
-        X_res, Y_res = sm.fit_sample(X,Y)
         print('Resampled dataset shape {}'.format(Counter(Y_res)))
 
-        outPutFile = open(dataSetDir + '/' + dataSetName + '_smote', 'w')
+        outPutFile = open(dataSetDir + '/' + dataSetName + '_smote_borderline1', 'w')
         for i in range(len(Y_res)):
             outStr = str(Y_res[i]) + ' '
             featureLen = len(X_res[i])

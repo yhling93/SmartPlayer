@@ -12,6 +12,8 @@ namespace SmartPlayer
 {
     public partial class LogInForm : Form
     {
+        StartForm mStartForm;
+
         public LogInForm()
         {
             InitializeComponent();
@@ -22,17 +24,33 @@ namespace SmartPlayer
             string name = stuNameBox.Text;
             string no = stuNoBox.Text;
 
+            mStartForm = new StartForm(name, no);
+            mStartForm.Show();
+            this.Hide();
+
+            /*
             PXCMSession session = PXCMSession.CreateInstance();
 
             MainForm main = new MainForm(session, name, no, this);
             main.Show();
             //this.Close();
             this.Hide();
+            */
         }
 
-        private void exitBtn_Click(object sender, EventArgs e)
+        private void registerBtn_Click(object sender, EventArgs e)
         {
-            this.Close();
+            // do register logic
+        }
+
+        private void LogInForm_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void loginPanel_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }
