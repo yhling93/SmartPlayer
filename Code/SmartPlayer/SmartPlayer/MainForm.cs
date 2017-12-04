@@ -18,6 +18,10 @@ namespace SmartPlayer
 {
     public partial class MainForm : Form
     {
+        // 20171214
+        public Data.CourseData.Course mCourse;
+        public string mCourseCode, mCourseName;
+        public List<string> mChapterList = new List<string>();
         // 20170723
         public Form loginForm;
         public Course curCourse;
@@ -61,15 +65,12 @@ namespace SmartPlayer
         /// <summary>
         /// 主窗体
         /// </summary>
-        public MainForm(PXCMSession session, string stuName, string stuNo, Form lForm)
+        public MainForm(PXCMSession session, string stuName, string stuNo, Form lForm, String courseName, String courseCode)
         {
             InitializeComponent();
             CheckForIllegalCrossThreadCalls = false;
             loginForm = lForm;
 
-            stuNameLabel.Text = stuName;
-            stuNoLabel.Text = stuNo;
-            stuAgeLabel.Text = "25";
 
             pb_Monitor.Paint += Pb_Monitor_Paint;
             // Session = session;
@@ -77,8 +78,12 @@ namespace SmartPlayer
 
             this.FormClosing += MainForm_FormClosing;
 
-            iniData();
+            mCourseName = courseName;
+            mCourseCode = courseCode;
+
+
             iniVideoModule();
+            iniData();
             modelComboBox.DataSource = emotionModel.modelPathMap.Keys.ToList();
             // iniPlayList();
 
@@ -90,6 +95,9 @@ namespace SmartPlayer
             {
                 // kafka+mongodb存储
             }
+
+ 
+            //iniData();
 
             // Sleep(200);
             var thread = new Thread(Go);
@@ -217,10 +225,47 @@ namespace SmartPlayer
         }
         private void iniData()
         {
-            Repo.init();
-            foreach(string coursename in Repo.courses.Keys) {
-                courseListBox.Items.Add(coursename);
-            }
+            //Repo.init();
+
+
+            courseNameLabel.Text = courseNameLabel.Text + mCourseName;
+            courseCodeLabel.Text = courseCodeLabel.Text + mCourseCode;
+
+            /*********** fake data **********/
+
+            mChapterList.Add("第一章 软件项目管理概述");
+            mChapterList.Add("第二章 软件项目确立");
+            mChapterList.Add("第三章 项目生存期模");
+            mChapterList.Add("第四章 软件项目需求管理");
+            mChapterList.Add("第五章 软件项目任务分解");
+            mChapterList.Add("第六章 软件项目成本计划");
+            mChapterList.Add("第七章 软件项目进度计划");
+            mChapterList.Add("第八章 软件项目质量计划");
+            mChapterList.Add("第九章 软件配置管理计划");
+            mChapterList.Add("第十章 软件项目质量计划");
+
+            helpTextLabel.Text = "活动（Activity）和对象（Object）\n\n一个活动是发生于系统中的某事，活动通常被描述为一件由触发器发起的事件，通过改变一个特征来将一件事物转换为另一事物。\n\n活动中涉及的元素被称为对象或实体。";
+            book1.Load(Environment.CurrentDirectory + "\\bookimages\\book1.jpg");
+            book2.Load(Environment.CurrentDirectory + "\\bookimages\\book2.jpg");
+            highLevelCourse1.Text = "高级软件工程 SE003";
+            videoListBox.DataSource = mChapterList;
+
+            amusedLabel.Text = "愉悦：12.45";
+            thinkingLabel.Text = "思考：43.12";
+            notetakingLabel.Text = "笔记：4.39";
+            confusedLabel.Text = "困惑：20.82";
+            surprisedLabel.Text = "惊讶：0.05";
+            distractedLabel.Text = "分心：2.35";
+            normalLabel.Text = "普通：16.37";
+            unknownLabel.Text = "未知：0.25";
+            concentratedLabel.Text = "专注：0.20";
+
+            thinkingLabel.ForeColor = Color.Red;
+            normalBtn.Text = "暂停播放";
+            
+            videoProgressLabel.Text = string.Format("{0}/{1}", mVideoModule.getTimeString(120), mVideoModule.getTimeString(528));
+            /*********** fake data **********/
+
             emotionModel.initUpdateAssistance(updateUiAccordingToEmotion);
             labelMap.Add(Emotion.EmotionType.Amused, amusedLabel);
             labelMap.Add(Emotion.EmotionType.Concentrated, concentratedLabel);
@@ -291,10 +336,9 @@ namespace SmartPlayer
             normalLabel.ForeColor = Color.Red;
             curLabel = normalLabel;
             videoListBox.SelectedIndex = idx;
-            curChapterLabel.Text = curVideoList[idx].VideoName;
+
             curVideoHelpMap = Repo.assistances[curVideoList[idx]];
-            curVideoWatchTimeLabel.Text = "0";
-            curFinishLabel.Text = "0";
+
 
             //int idx = (sender as ListBox).SelectedIndex;
             curPlayFile = playList[idx];
@@ -561,17 +605,7 @@ namespace SmartPlayer
 
         private void courseListBox_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            int idx = courseListBox.IndexFromPoint(e.Location);
-            if (idx == ListBox.NoMatches)
-                return;
-            string selectedCourse = (string)courseListBox.SelectedItem;
-            curCourse = Repo.courses[selectedCourse];
-            curCourseChapter = Repo.courseDetails[curCourse];
-            curVideoList = curCourseChapter.Videos;
-            curCourseLabel.Text = curCourse.CourseName;
-            curCourseDescLabel.Text = curCourse.CourseDesc;
-            curCourseDiffLabel.Text = curCourse.CourseDifficulty.ToString();
-            iniPlayList();
+
         }
 
         /**************** Learning Session ****************/

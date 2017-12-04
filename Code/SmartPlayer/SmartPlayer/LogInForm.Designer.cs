@@ -148,7 +148,7 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.loginPanel);
             this.Name = "LogInForm";
-            this.Text = "LogInForm";
+            this.Text = "系统登录";
             this.Load += new System.EventHandler(this.LogInForm_Load);
             this.loginPanel.ResumeLayout(false);
             this.loginPanel.PerformLayout();

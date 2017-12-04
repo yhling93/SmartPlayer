@@ -39,11 +39,12 @@ namespace SmartPlayer
         {
             
             modelPathMap = new Dictionary<string, string>(); // 模型路径信息
-            modelPathMap.Add("SMOTE", Environment.CurrentDirectory + "\\models\\data_after_boardline_smote.scale.model");
-            modelPathMap.Add("SMOTE and PCA", Environment.CurrentDirectory + "\\models\\data_after_boardline_smote_and_pca_with_49.scale.model");
-            modelPathMap.Add("Undersampling", Environment.CurrentDirectory + "\\models\\data_after_undersampling.scale.model");
-            modelPathMap.Add("Undersampling and PCA", Environment.CurrentDirectory + "\\models\\data_after_undersampling_and_pca_with_49.scale.model");
-            svmModel = SVM.LoadModel(modelPathMap["SMOTE"]); // 加载默认模型
+            modelPathMap.Add("混合模型（5秒）", Environment.CurrentDirectory + "\\models\\data_after_boardline_smote.scale.model");
+            modelPathMap.Add("混合模型（10秒）", Environment.CurrentDirectory + "\\models\\data_after_boardline_smote_and_pca_with_49.scale.model");
+            modelPathMap.Add("交互模型（5秒）", Environment.CurrentDirectory + "\\models\\data_after_undersampling.scale.model");
+            modelPathMap.Add("交互模型（10秒）", Environment.CurrentDirectory + "\\models\\data_after_undersampling_and_pca_with_49.scale.model");
+            modelPathMap.Add("人像模型", Environment.CurrentDirectory + "\\models\\data_after_undersampling_and_pca_with_49.scale.model");
+            svmModel = SVM.LoadModel(modelPathMap["混合模型（5秒）"]); // 加载默认模型
             // 初始化特征向量
             for (int i = 0; i < featureNum; i++)
                 svmFeature[i] = new SVMNode(i, 0);
